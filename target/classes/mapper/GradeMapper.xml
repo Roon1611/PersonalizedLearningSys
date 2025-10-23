@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.personalizedlearning.system.mapper.GradeMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.personalizedlearning.system.entity.Grade">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="score" property="score" jdbcType="DECIMAL"/>
+        <result column="exam_type" property="examType" jdbcType="VARCHAR"/>
+        <result column="exam_name" property="examName" jdbcType="VARCHAR"/>
+        <result column="exam_date" property="examDate" jdbcType="DATE"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 插入成绩 -->
+    <insert id="insert" parameterType="com.personalizedlearning.system.entity.Grade">
+        INSERT INTO grades (student_id, course_id, score, exam_type, exam_name, exam_date)
+        VALUES (#{studentId}, #{courseId}, #{score}, #{examType}, #{examName}, #{examDate})
+    </insert>
+
+    <!-- 更新成绩 -->
+    <update id="update" parameterType="com.personalizedlearning.system.entity.Grade">
+        UPDATE grades
+        SET student_id = #{studentId},
+            course_id = #{courseId},
+            score = #{score},
+            exam_type = #{examType},
+            exam_name = #{examName},
+            exam_date = #{examDate}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除成绩 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM grades WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID查询成绩 -->
+    <select id="findById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM grades WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有成绩 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM grades
+    </select>
+
+    <!-- 根据学生ID查询成绩 -->
+    <select id="findByStudentId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM grades WHERE student_id = #{studentId}
+    </select>
+
+    <!-- 根据课程ID查询成绩 -->
+    <select id="findByCourseId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM grades WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 根据学生和课程ID查询成绩 -->
+    <select id="findByStudentAndCourse" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM grades
+        WHERE student_id = #{studentId} AND course_id = #{courseId}
+    </select>
+
+    <!-- 计算课程平均分 -->
+    <select id="calculateAverageScoreByCourseId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT AVG(score) FROM grades WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 计算学生平均分 -->
+    <select id="calculateAverageScoreByStudentId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT AVG(score) FROM grades WHERE student_id = #{studentId}
+    </select>
+
+    <!-- 获取课程最高分 -->
+    <select id="findHighestScoreByCourseId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT MAX(score) FROM grades WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 获取课程最低分 -->
+    <select id="findLowestScoreByCourseId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT MIN(score) FROM grades WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 获取课程中位数成绩 -->
+    <select id="findMedianScoreByCourseId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT AVG(score) AS median
+        FROM (
+            SELECT score, 
+                   ROW_NUMBER() OVER (ORDER BY score) AS row_num, 
+                   COUNT(*) OVER () AS total_rows
+            FROM grades
+            WHERE course_id = #{courseId}
+        ) AS temp
+        WHERE row_num IN (FLOOR((total_rows + 1) / 2), CEIL((total_rows + 1) / 2))
+    </select>
+
+    <!-- 获取课程及格人数 -->
+    <select id="findPassedStudentsByCourseId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT student_id) FROM grades
+        WHERE course_id = #{courseId} AND score >= 60
+    </select>
+
+    <!-- 获取课程学生总数 -->
+    <select id="getTotalStudentsByCourseId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT student_id) FROM grades
+        WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 获取成绩分布 -->
+    <select id="getGradeDistributionByCourseId" parameterType="java.lang.Long" resultType="map">
+        SELECT 
+            CONCAT("0-59", '%') AS range,
+            COUNT(*) AS count
+        FROM grades
+        WHERE course_id = #{courseId} AND score < 60
+        UNION ALL
+        SELECT 
+            CONCAT("60-69", '%') AS range,
+            COUNT(*) AS count
+        FROM grades
+        WHERE course_id = #{courseId} AND score >= 60 AND score < 70
+        UNION ALL
+        SELECT 
+            CONCAT("70-79", '%') AS range,
+            COUNT(*) AS count
+        FROM grades
+        WHERE course_id = #{courseId} AND score >= 70 AND score < 80
+        UNION ALL
+        SELECT 
+            CONCAT("80-89", '%') AS range,
+            COUNT(*) AS count
+        FROM grades
+        WHERE course_id = #{courseId} AND score >= 80 AND score < 90
+        UNION ALL
+        SELECT 
+            CONCAT("90-100", '%') AS range,
+            COUNT(*) AS count
+        FROM grades
+        WHERE course_id = #{courseId} AND score >= 90
+    </select>
+
+    <!-- 分页查询成绩 -->
+    <select id="findByPage" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM grades LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 查询成绩总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM grades
+    </select>
+
+    <!-- 根据考试类型查询成绩 -->
+    <select id="findByExamType" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM grades WHERE exam_type = #{examType}
+    </select>
+</mapper>

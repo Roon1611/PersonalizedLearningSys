@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.personalizedlearning.system.mapper.AssignmentMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.personalizedlearning.system.entity.Assignment">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="LONGVARCHAR"/>
+        <result column="category" property="category" jdbcType="VARCHAR"/>
+        <result column="deadline" property="deadline" jdbcType="TIMESTAMP"/>
+        <result column="estimated_time" property="estimatedTime" jdbcType="INTEGER"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 插入作业 -->
+    <insert id="insert" parameterType="com.personalizedlearning.system.entity.Assignment">
+        INSERT INTO assignments (course_id, title, description, category, deadline, estimated_time, status)
+        VALUES (#{courseId}, #{title}, #{description}, #{category}, #{deadline}, #{estimatedTime}, #{status})
+    </insert>
+
+    <!-- 更新作业 -->
+    <update id="update" parameterType="com.personalizedlearning.system.entity.Assignment">
+        UPDATE assignments
+        SET course_id = #{courseId},
+            title = #{title},
+            description = #{description},
+            category = #{category},
+            deadline = #{deadline},
+            estimated_time = #{estimatedTime},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除作业 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM assignments WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID查询作业 -->
+    <select id="findById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM assignments WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有作业 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM assignments
+    </select>
+
+    <!-- 根据课程ID查询作业 -->
+    <select id="findByCourseId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM assignments WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 根据教师ID查询作业 -->
+    <select id="findByTeacherId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT a.* FROM assignments a
+        JOIN courses c ON a.course_id = c.id
+        WHERE c.teacher_id = #{teacherId}
+    </select>
+
+    <!-- 查询学生待提交作业 -->
+    <select id="findPendingAssignmentsByStudentId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT a.* FROM assignments a
+        JOIN courses c ON a.course_id = c.id
+        JOIN student_courses sc ON c.id = sc.course_id
+        LEFT JOIN assignment_submissions s ON a.id = s.assignment_id AND sc.student_id = s.student_id
+        WHERE sc.student_id = #{studentId} AND s.id IS NULL
+    </select>
+
+    <!-- 查询学生已提交作业 -->
+    <select id="findSubmittedAssignmentsByStudentId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT DISTINCT a.* FROM assignments a
+        JOIN assignment_submissions s ON a.id = s.assignment_id
+        WHERE s.student_id = #{studentId}
+    </select>
+
+    <!-- 根据截止日期查询作业 -->
+    <select id="findByDeadline" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM assignments
+        WHERE deadline BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <!-- 更新作业状态 -->
+    <update id="updateStatus" parameterType="map">
+        UPDATE assignments
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 查询即将截止的作业 -->
+    <select id="findUpcomingAssignments" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT * FROM assignments
+        WHERE deadline BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL #{days} DAY)
+    </select>
+
+    <!-- 分页查询作业 -->
+    <select id="findByPage" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM assignments LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 查询作业总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM assignments
+    </select>
+
+    <!-- 根据状态查询作业 -->
+    <select id="findByStatus" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM assignments WHERE status = #{status}
+    </select>
+</mapper>
