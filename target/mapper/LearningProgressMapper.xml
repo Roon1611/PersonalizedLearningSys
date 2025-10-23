@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.personalizedlearning.system.mapper.LearningProgressMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.personalizedlearning.system.entity.LearningProgress">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="student_id" property="studentId" jdbcType="BIGINT"/>
+        <result column="course_id" property="courseId" jdbcType="BIGINT"/>
+        <result column="chapter_id" property="chapterId" jdbcType="INTEGER"/>
+        <result column="progress" property="completionRate" jdbcType="INTEGER"/>
+        <result column="last_learned_at" property="lastLearnedAt" jdbcType="TIMESTAMP"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 插入学习进度 -->
+    <insert id="insert" parameterType="com.personalizedlearning.system.entity.LearningProgress">
+        INSERT INTO learning_progress (student_id, course_id, chapter_id, progress, last_learned_at)
+        VALUES (#{studentId}, #{courseId}, #{chapterId}, #{completionRate}, #{lastLearnedAt})
+    </insert>
+
+    <!-- 更新学习进度 -->
+    <update id="update" parameterType="com.personalizedlearning.system.entity.LearningProgress">
+        UPDATE learning_progress
+        SET student_id = #{studentId},
+            course_id = #{courseId},
+            chapter_id = #{chapterId},
+            progress = #{completionRate},
+            last_learned_at = #{lastLearnedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除学习进度 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM learning_progress WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID查询学习进度 -->
+    <select id="findById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM learning_progress WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有学习进度 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM learning_progress
+    </select>
+
+    <!-- 根据学生ID和课程ID查询学习进度 -->
+    <select id="findByStudentIdAndCourseId" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM learning_progress
+        WHERE student_id = #{studentId} AND course_id = #{courseId}
+    </select>
+
+    <!-- 根据学生ID查询学习进度 -->
+    <select id="findByStudentId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM learning_progress WHERE student_id = #{studentId}
+    </select>
+
+    <!-- 根据课程ID查询学习进度 -->
+    <select id="findByCourseId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM learning_progress WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 计算课程平均完成度 -->
+    <select id="calculateAverageCompletionRateByCourseId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT AVG(progress) FROM learning_progress WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 计算学生平均完成度 -->
+    <select id="calculateAverageCompletionRateByStudentId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT AVG(progress) FROM learning_progress WHERE student_id = #{studentId}
+    </select>
+
+    <!-- 获取课程最高完成度 -->
+    <select id="findHighestCompletionRateByCourseId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT MAX(progress) FROM learning_progress WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 获取课程最低完成度 -->
+    <select id="findLowestCompletionRateByCourseId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT MIN(progress) FROM learning_progress WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 获取课程中位数完成度 -->
+    <select id="findMedianCompletionRateByCourseId" parameterType="java.lang.Long" resultType="java.lang.Double">
+        SELECT AVG(progress) AS median
+        FROM (
+            SELECT progress, 
+                   ROW_NUMBER() OVER (ORDER BY progress) AS row_num, 
+                   COUNT(*) OVER () AS total_rows
+            FROM learning_progress
+            WHERE course_id = #{courseId}
+        ) AS temp
+        WHERE row_num IN (FLOOR((total_rows + 1) / 2), CEIL((total_rows + 1) / 2))
+    </select>
+
+    <!-- 获取课程完成学生数 -->
+    <select id="findCompletedStudentsByCourseId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT student_id) FROM learning_progress
+        WHERE course_id = #{courseId} AND progress >= 100
+    </select>
+
+    <!-- 获取课程学生总数 -->
+    <select id="getTotalStudentsByCourseId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT student_id) FROM learning_progress
+        WHERE course_id = #{courseId}
+    </select>
+
+    <!-- 查询学习进度低于指定阈值的学生 -->
+    <select id="findByCompletionRateBelow" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM learning_progress
+        WHERE course_id = #{courseId} AND progress < #{threshold}
+    </select>
+
+    <!-- 分页查询学习进度 -->
+    <select id="findByPage" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM learning_progress LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 查询学习进度总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM learning_progress
+    </select>
+
+    <!-- 根据章节ID查询学习进度 -->
+    <select id="findByChapterId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT * FROM learning_progress WHERE chapter_id = #{chapterId}
+    </select>
+</mapper>
