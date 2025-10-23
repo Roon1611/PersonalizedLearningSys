@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>成绩查询 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .grade-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .grade-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- 顶部导航栏 -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center">
+          <a href="#" class="flex-shrink-0 flex items-center">
+            <i class="fa fa-graduation-cap text-primary text-2xl mr-2"></i>
+            <span class="font-bold text-lg text-primary">学习路径系统</span>
+          </a>
+          
+          <!-- 导航链接 - 中等屏幕以上显示 -->
+          <div class="hidden md:ml-10 md:flex md:space-x-8">
+            <a href="student_dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-home mr-2"></i>
+              首页
+            </a>
+            <a href="courses.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-book mr-2"></i>
+              我的课程
+            </a>
+            <a href="assignments.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-file-text mr-2"></i>
+              作业中心
+            </a>
+            <a href="grades.html" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-graduation-cap mr-2"></i>
+              成绩查询
+            </a>
+          </div>
+        </div>
+        
+        <!-- 右侧用户信息和操作 -->
+        <div class="flex items-center">
+          <!-- 搜索框 -->
+          <div class="hidden md:block">
+            <div class="ml-3 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fa fa-search text-gray-400"></i>
+              </div>
+              <input class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary" placeholder="搜索课程成绩...">
+            </div>
+          </div>
+          
+          <!-- 通知图标 -->
+          <div class="ml-3 relative">
+            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-bell text-xl"></i>
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
+            </button>
+          </div>
+          
+          <!-- 智能助手 -->
+          <div class="ml-3 relative">
+            <button class="chat-bot-button text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-robot text-xl text-primary"></i>
+            </button>
+          </div>
+          
+          <!-- 用户头像 -->
+          <div class="ml-3 relative">
+            <div class="flex items-center">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/64/200/200" alt="用户头像">
+              <span class="ml-2 text-sm font-medium text-gray-700">张同学</span>
+              <i class="fa fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- 页面标题和筛选 -->
+    <div class="mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">成绩查询</h1>
+          <p class="text-gray-600 mt-1">查看你的课程成绩和学习表现</p>
+        </div>
+        
+        <div class="mt-4 md:mt-0 flex space-x-4">
+          <!-- 学期筛选 -->
+          <div class="relative">
+            <select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+              <option>2023-2024学年第一学期</option>
+              <option>2022-2023学年第二学期</option>
+              <option>2022-2023学年第一学期</option>
+            </select>
+          </div>
+          
+          <!-- 搜索按钮（移动端） -->
+          <div class="md:hidden">
+            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 成绩概览卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- 平均成绩 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-medium text-gray-500">平均成绩</h3>
+            <span class="text-xs text-green-600 font-medium">较上学期 +3.2</span>
+          </div>
+          <div class="mt-2 flex items-baseline">
+            <span class="text-4xl font-extrabold text-gray-900">88.5</span>
+            <span class="ml-2 text-sm font-medium text-gray-500">/ 100</span>
+          </div>
+          <div class="mt-4">
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-green-500 h-2 rounded-full" style="width: 88%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 已完成课程 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-medium text-gray-500">已完成课程</h3>
+            <span class="text-xs text-blue-600 font-medium">本学期 12门</span>
+          </div>
+          <div class="mt-2 flex items-baseline">
+            <span class="text-4xl font-extrabold text-gray-900">15</span>
+            <span class="ml-2 text-sm font-medium text-gray-500">门课程</span>
+          </div>
+          <div class="mt-4 flex items-center space-x-2">
+            <div class="flex-1 bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-500 h-2 rounded-full" style="width: 75%"></div>
+            </div>
+            <span class="text-xs font-medium text-gray-500">75%</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- GPA -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-medium text-gray-500">平均学分绩点</h3>
+            <span class="text-xs text-green-600 font-medium">较上学期 +0.3</span>
+          </div>
+          <div class="mt-2 flex items-baseline">
+            <span class="text-4xl font-extrabold text-gray-900">3.6</span>
+            <span class="ml-2 text-sm font-medium text-gray-500">/ 4.0</span>
+          </div>
+          <div class="mt-4">
+            <div class="flex space-x-1">
+              <div class="flex-1 h-12 bg-green-500 rounded flex items-center justify-center text-white font-bold">A</div>
+              <div class="flex-1 h-12 bg-green-500/80 rounded flex items-center justify-center text-white font-bold">A</div>
+              <div class="flex-1 h-12 bg-yellow-500 rounded flex items-center justify-center text-white font-bold">B</div>
+              <div class="flex-1 h-12 bg-green-500 rounded flex items-center justify-center text-white font-bold">A</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 成绩分析图表 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- 成绩分布图表 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-gray-900">成绩分布</h3>
+            <div class="flex space-x-2">
+              <button class="px-3 py-1 text-xs font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">
+                按分数段
+              </button>
+              <button class="px-3 py-1 text-xs font-medium rounded-md text-white bg-primary hover:bg-primary/90">
+                按等级
+              </button>
+            </div>
+          </div>
+          
+          <!-- 模拟图表 -->
+          <div class="h-64 flex items-end justify-between px-4 space-x-4">
+            <div class="flex flex-col items-center">
+              <div class="bg-green-500 w-10 rounded-t h-40"></div>
+              <span class="mt-2 text-xs text-gray-500">A</span>
+              <span class="text-sm font-medium text-gray-900">5门</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="bg-yellow-500 w-10 rounded-t h-32"></div>
+              <span class="mt-2 text-xs text-gray-500">B</span>
+              <span class="text-sm font-medium text-gray-900">4门</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="bg-orange-500 w-10 rounded-t h-16"></div>
+              <span class="mt-2 text-xs text-gray-500">C</span>
+              <span class="text-sm font-medium text-gray-900">2门</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="bg-red-500 w-10 rounded-t h-8"></div>
+              <span class="mt-2 text-xs text-gray-500">D</span>
+              <span class="text-sm font-medium text-gray-900">1门</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="bg-gray-500 w-10 rounded-t h-0"></div>
+              <span class="mt-2 text-xs text-gray-500">F</span>
+              <span class="text-sm font-medium text-gray-900">0门</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 学习表现趋势 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-bold text-gray-900">学习表现趋势</h3>
+            <div class="flex space-x-2">
+              <button class="px-3 py-1 text-xs font-medium rounded-md text-white bg-primary hover:bg-primary/90">
+                本学期
+              </button>
+              <button class="px-3 py-1 text-xs font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50">
+                全年
+              </button>
+            </div>
+          </div>
+          
+          <!-- 模拟图表 -->
+          <div class="h-64 relative">
+            <!-- 网格线 -->
+            <div class="absolute inset-0 grid grid-rows-5 gap-4 pointer-events-none">
+              <div class="h-px bg-gray-200"></div>
+              <div class="h-px bg-gray-200"></div>
+              <div class="h-px bg-gray-200"></div>
+              <div class="h-px bg-gray-200"></div>
+            </div>
+            
+            <!-- 趋势线 -->
+            <svg class="w-full h-full" viewBox="0 0 400 200">
+              <path d="M0,150 L40,140 L80,130 L120,145 L160,120 L200,110 L240,90 L280,80 L320,65 L360,60 L400,50" fill="none" stroke="#4361ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M0,150 L40,140 L80,130 L120,145 L160,120 L200,110 L240,90 L280,80 L320,65 L360,60 L400,50" fill="rgba(67, 97, 238, 0.1)" stroke="none"/>
+              
+              <!-- 数据点 -->
+              <circle cx="0" cy="150" r="4" fill="#4361ee"/>
+              <circle cx="40" cy="140" r="4" fill="#4361ee"/>
+              <circle cx="80" cy="130" r="4" fill="#4361ee"/>
+              <circle cx="120" cy="145" r="4" fill="#4361ee"/>
+              <circle cx="160" cy="120" r="4" fill="#4361ee"/>
+              <circle cx="200" cy="110" r="4" fill="#4361ee"/>
+              <circle cx="240" cy="90" r="4" fill="#4361ee"/>
+              <circle cx="280" cy="80" r="4" fill="#4361ee"/>
+              <circle cx="320" cy="65" r="4" fill="#4361ee"/>
+              <circle cx="360" cy="60" r="4" fill="#4361ee"/>
+              <circle cx="400" cy="50" r="4" fill="#4361ee"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 详细成绩表格 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-bold text-gray-900">课程成绩明细</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                课程名称
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                学分
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                平时成绩
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                测验成绩
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                考试成绩
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                总成绩
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                等级
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                状态
+              </th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                操作
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <!-- 已完成课程 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">大学物理</div>
+                    <div class="text-xs text-gray-500">赵教授</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">90</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">88</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">92</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="text-sm font-medium text-gray-900">92</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  A
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">已完成</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button class="grade-detail-btn text-primary hover:text-primary/80">
+                  查看详情
+                </button>
+              </td>
+            </tr>
+            
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">高等数学（上）</div>
+                    <div class="text-xs text-gray-500">李教授</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">5</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">85</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">82</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">88</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="text-sm font-medium text-gray-900">86</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  A
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">已完成</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button class="grade-detail-btn text-primary hover:text-primary/80">
+                  查看详情
+                </button>
+              </td>
+            </tr>
+            
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">大学英语（上）</div>
+                    <div class="text-xs text-gray-500">王老师</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">88</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">92</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">90</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="text-sm font-medium text-gray-900">90</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  A
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">已完成</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button class="grade-detail-btn text-primary hover:text-primary/80">
+                  查看详情
+                </button>
+              </td>
+            </tr>
+            
+            <!-- 进行中课程 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">高等数学</div>
+                    <div class="text-xs text-gray-500">李教授</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">4</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">82</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">75</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="text-sm font-medium text-gray-900">78</div>
+                  <span class="ml-2 text-xs text-blue-600 font-medium">待更新</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                  进行中
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button class="grade-detail-btn text-primary hover:text-primary/80">
+                  查看详情
+                </button>
+              </td>
+            </tr>
+            
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">线性代数</div>
+                    <div class="text-xs text-gray-500">王教授</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">88</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">80</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="text-sm font-medium text-gray-900">84</div>
+                  <span class="ml-2 text-xs text-blue-600 font-medium">待更新</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                  进行中
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button class="grade-detail-btn text-primary hover:text-primary/80">
+                  查看详情
+                </button>
+              </td>
+            </tr>
+            
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">概率论与数理统计</div>
+                    <div class="text-xs text-gray-500">张教授</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">92</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">88</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="text-sm font-medium text-gray-900">90</div>
+                  <span class="ml-2 text-xs text-blue-600 font-medium">待更新</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                  进行中
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button class="grade-detail-btn text-primary hover:text-primary/80">
+                  查看详情
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- 分页控件 -->
+      <div class="px-6 py-4 bg-white border-t border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                显示第 <span class="font-medium">1</span> 到 <span class="font-medium">6</span> 条，共 <span class="font-medium">12</span> 条结果
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">上一页</span>
+                  <i class="fa fa-chevron-left"></i>
+                </a>
+                <a href="#" aria-current="page" class="z-10 bg-primary text-white relative inline-flex items-center px-4 py-2 border border-primary text-sm font-medium">
+                  1
+                </a>
+                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                  2
+                </a>
+                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">下一页</span>
+                  <i class="fa fa-chevron-right"></i>
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 学习建议 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-bold text-gray-900">学习建议</h2>
+      </div>
+      <div class="p-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <i class="fa fa-lightbulb-o text-yellow-500 text-xl"></i>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-900">基于你的成绩分析，我们为你提供以下学习建议</h3>
+            <div class="mt-2 text-sm text-gray-600">
+              <ul class="list-disc pl-5 space-y-2">
+                <li><span class="font-medium">高等数学</span>：你的测验成绩较低（75分），建议重点复习极限计算相关知识点，可以观看推荐视频《极限计算难点解析》</li>
+                <li><span class="font-medium">线性代数</span>：你的表现良好，但矩阵变换部分可以进一步加强，推荐完成额外练习《矩阵变换习题集》</li>
+                <li><span class="font-medium">概率论与数理统计</span>：你的表现优秀，建议可以考虑挑战进阶内容，如贝叶斯统计和机器学习基础</li>
+                <li>整体来看，你的学习表现呈上升趋势，保持当前的学习节奏和方法，定期复习巩固知识点</li>
+              </ul>
+            </div>
+            <div class="mt-4">
+              <button class="recommendation-button data-course-id="all" inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fa fa-graduation-cap mr-2"></i>
+                获取个性化学习路径
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-500">
+        © 2025 个性化学习路径的在线课程管理系统 | 版权所有
+      </p>
+    </div>
+  </footer>
+
+  <!-- 模态框：成绩详情 -->
+  <div id="grade-detail-modal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h4 class="modal-title">成绩详情</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- 内容将通过JavaScript动态加载 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-close px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          关闭
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：学习路径推荐 -->
+  <div id="recommendation-modal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h4 class="modal-title">个性化学习路径推荐</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- 内容将通过JavaScript动态加载 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-close px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          关闭
+        </button>
+        <button class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          采纳推荐
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：智能答疑机器人 -->
+  <div id="chat-bot-modal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <div class="modal-header">
+        <h4 class="modal-title">智能学习助手</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <div class="chat-container h-[400px] overflow-y-auto p-4 space-y-3">
+          <!-- 聊天内容将通过JavaScript动态加载 -->
+        </div>
+        <div class="border-t p-3 flex">
+          <input type="text" class="chat-input flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="请问有什么可以帮助你的？">
+          <button class="chat-send px-4 py-2 bg-primary text-white rounded-r-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fa fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入必要的JavaScript -->
+  <script src="../assets/js/backend.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查用户登录状态
+      checkLoginStatus();
+      
+      // 获取DOM元素
+      const semesterSelect = document.querySelector('select');
+      const gradeTableBody = document.querySelector('.overflow-x-auto tbody');
+      const gradeDetailModal = document.getElementById('grade-detail-modal');
+      const gradeDetailModalClose = document.querySelectorAll('#grade-detail-modal .modal-close');
+      const recommendationModal = document.getElementById('recommendation-modal');
+      const recommendationModalClose = document.querySelectorAll('#recommendation-modal .modal-close');
+      const chatBotModal = document.getElementById('chat-bot-modal');
+      const chatBotModalClose = document.querySelectorAll('#chat-bot-modal .modal-close');
+      const chatBotButton = document.querySelector('.chat-bot-button');
+      const gradeDetailButtons = document.querySelectorAll('.grade-detail-btn');
+      const recommendationButton = document.querySelector('.recommendation-button');
+      const loadingIndicator = document.getElementById('global-loading');
+      const gradeDistributionTab1 = document.querySelector('.grid-cols-1.md\:grid-cols-2.gap-6 button:nth-child(1)');
+      const gradeDistributionTab2 = document.querySelector('.grid-cols-1.md\:grid-cols-2.gap-6 button:nth-child(2)');
+      const performanceTrendTab1 = document.querySelector('.grid-cols-1.md\:grid-cols-2.gap-6 .h-64.relative ~ div button:nth-child(1)');
+      const performanceTrendTab2 = document.querySelector('.grid-cols-1.md\:grid-cols-2.gap-6 .h-64.relative ~ div button:nth-child(2)');
+      
+      // 初始化加载成绩数据
+      loadGradeData();
+      
+      // 加载成绩数据
+      function loadGradeData() {
+        // 显示加载指示器
+        showLoading();
+        
+        try {
+          // 模拟API请求获取成绩数据
+          setTimeout(() => {
+            // 实际项目中，这里应该是一个真实的API调用
+            // 这里使用模拟数据进行演示
+            const gradeData = {
+              summary: {
+                averageGrade: 88.5,
+                previousAverageGrade: 85.3,
+                completedCourses: 15,
+               本学期Courses: 12,
+                totalCourses: 20,
+                gpa: 3.6,
+                previousGpa: 3.3,
+                gradeDistribution: {
+                  A: 5,
+                  B: 4,
+                  C: 2,
+                  D: 1,
+                  F: 0
+                }
+              },
+              courses: [
+                {
+                  id: 'phys-101',
+                  name: '大学物理',
+                  instructor: '赵教授',
+                  credits: 4,
+                  dailyScore: 90,
+                  quizScore: 88,
+                  examScore: 92,
+                  totalScore: 92,
+                  grade: 'A',
+                  status: 'completed'
+                },
+                {
+                  id: 'math-101',
+                  name: '高等数学（上）',
+                  instructor: '李教授',
+                  credits: 5,
+                  dailyScore: 85,
+                  quizScore: 82,
+                  examScore: 88,
+                  totalScore: 86,
+                  grade: 'A',
+                  status: 'completed'
+                },
+                {
+                  id: 'eng-101',
+                  name: '大学英语（上）',
+                  instructor: '王老师',
+                  credits: 3,
+                  dailyScore: 88,
+                  quizScore: 92,
+                  examScore: 90,
+                  totalScore: 90,
+                  grade: 'A',
+                  status: 'completed'
+                },
+                {
+                  id: 'math-201',
+                  name: '高等数学',
+                  instructor: '李教授',
+                  credits: 4,
+                  dailyScore: 82,
+                  quizScore: 75,
+                  examScore: null,
+                  totalScore: 78,
+                  grade: null,
+                  status: 'in-progress'
+                },
+                {
+                  id: 'math-301',
+                  name: '线性代数',
+                  instructor: '王教授',
+                  credits: 3,
+                  dailyScore: 88,
+                  quizScore: 80,
+                  examScore: null,
+                  totalScore: 84,
+                  grade: null,
+                  status: 'in-progress'
+                },
+                {
+                  id: 'math-401',
+                  name: '概率论与数理统计',
+                  instructor: '张教授',
+                  credits: 3,
+                  dailyScore: 92,
+                  quizScore: 88,
+                  examScore: null,
+                  totalScore: 90,
+                  grade: null,
+                  status: 'in-progress'
+                }
+              ],
+              performanceTrend: [
+                { term: '第1周', score: 75 },
+                { term: '第2周', score: 78 },
+                { term: '第3周', score: 80 },
+                { term: '第4周', score: 77 },
+                { term: '第5周', score: 82 },
+                { term: '第6周', score: 85 },
+                { term: '第7周', score: 88 },
+                { term: '第8周', score: 89 },
+                { term: '第9周', score: 92 },
+                { term: '第10周', score: 93 },
+                { term: '第11周', score: 94 },
+                { term: '第12周', score: 95 }
+              ],
+              learningSuggestions: [
+                {
+                  course: '高等数学',
+                  content: '你的测验成绩较低（75分），建议重点复习极限计算相关知识点，可以观看推荐视频《极限计算难点解析》',
+                  priority: 'high'
+                },
+                {
+                  course: '线性代数',
+                  content: '你的表现良好，但矩阵变换部分可以进一步加强，推荐完成额外练习《矩阵变换习题集》',
+                  priority: 'medium'
+                },
+                {
+                  course: '概率论与数理统计',
+                  content: '你的表现优秀，建议可以考虑挑战进阶内容，如贝叶斯统计和机器学习基础',
+                  priority: 'low'
+                },
+                {
+                  course: '整体',
+                  content: '整体来看，你的学习表现呈上升趋势，保持当前的学习节奏和方法，定期复习巩固知识点',
+                  priority: 'normal'
+                }
+              ]
+            };
+            
+            // 更新成绩概览数据
+            updateGradeSummary(gradeData.summary);
+            
+            // 更新成绩分布图表
+            updateGradeDistribution(gradeData.summary.gradeDistribution);
+            
+            // 更新学习表现趋势图表
+            updatePerformanceTrend(gradeData.performanceTrend);
+            
+            // 更新成绩表格
+            updateGradeTable(gradeData.courses);
+            
+            // 更新学习建议
+            updateLearningSuggestions(gradeData.learningSuggestions);
+            
+            // 隐藏加载指示器
+            hideLoading();
+          }, 1500);
+        } catch (error) {
+          console.error('加载成绩数据失败:', error);
+          showNotification('加载成绩数据失败，请稍后重试', 'error');
+          hideLoading();
+        }
+      }
+      
+      // 更新成绩概览数据
+      function updateGradeSummary(summary) {
+        // 更新平均成绩
+        const averageGradeElement = document.querySelector('.text-4xl.font-extrabold.text-gray-900');
+        averageGradeElement.textContent = summary.averageGrade;
+        
+        const averageGradeChangeElement = document.querySelector('.text-xs.text-green-600.font-medium');
+        const gradeDiff = (summary.averageGrade - summary.previousAverageGrade).toFixed(1);
+        const gradeDiffClass = gradeDiff > 0 ? 'text-green-600' : 'text-red-600';
+        averageGradeChangeElement.textContent = `较上学期 ${gradeDiff > 0 ? '+' : ''}${gradeDiff}`;
+        averageGradeChangeElement.className = `text-xs ${gradeDiffClass} font-medium`;
+        
+        // 更新已完成课程
+        const completedCoursesElement = document.querySelector('.grid-cols-1.md\:grid-cols-3.gap-6.mb-8 .text-4xl.font-extrabold.text-gray-900:nth-child(2)');
+        completedCoursesElement.textContent = summary.completedCourses;
+        
+        // 更新GPA
+        const gpaElement = document.querySelector('.grid-cols-1.md\:grid-cols-3.gap-6.mb-8 .text-4xl.font-extrabold.text-gray-900:nth-child(3)');
+        gpaElement.textContent = summary.gpa;
+        
+        const gpaChangeElement = document.querySelectorAll('.text-xs.text-green-600.font-medium')[1];
+        const gpaDiff = (summary.gpa - summary.previousGpa).toFixed(1);
+        const gpaDiffClass = gpaDiff > 0 ? 'text-green-600' : 'text-red-600';
+        gpaChangeElement.textContent = `较上学期 ${gpaDiff > 0 ? '+' : ''}${gpaDiff}`;
+        gpaChangeElement.className = `text-xs ${gpaDiffClass} font-medium`;
+      }
+      
+      // 更新成绩分布图表
+      function updateGradeDistribution(distribution) {
+        // 这里简化处理，实际项目中可能需要使用图表库
+        const gradeBars = document.querySelectorAll('.h-64.flex.items-end.justify-between.px-4.space-x-4 .bg-green-500.w-10.rounded-t, .h-64.flex.items-end.justify-between.px-4.space-x-4 .bg-yellow-500.w-10.rounded-t, .h-64.flex.items-end.justify-between.px-4.space-x-4 .bg-orange-500.w-10.rounded-t, .h-64.flex.items-end.justify-between.px-4.space-x-4 .bg-red-500.w-10.rounded-t, .h-64.flex.items-end.justify-between.px-4.space-x-4 .bg-gray-500.w-10.rounded-t');
+        
+        const gradeCountElements = document.querySelectorAll('.h-64.flex.items-end.justify-between.px-4.space-x-4 .text-sm.font-medium.text-gray-900');
+        
+        // 计算最大课程数量用于缩放
+        const maxCount = Math.max(distribution.A, distribution.B, distribution.C, distribution.D, distribution.F);
+        
+        // 更新每个等级的柱状图高度
+        gradeBars[0].style.height = `${(distribution.A / maxCount) * 100}%`;
+        gradeBars[1].style.height = `${(distribution.B / maxCount) * 100}%`;
+        gradeBars[2].style.height = `${(distribution.C / maxCount) * 100}%`;
+        gradeBars[3].style.height = `${(distribution.D / maxCount) * 100}%`;
+        gradeBars[4].style.height = `${(distribution.F / maxCount) * 100}%`;
+        
+        // 更新每个等级的课程数量
+        gradeCountElements[0].textContent = `${distribution.A}门`;
+        gradeCountElements[1].textContent = `${distribution.B}门`;
+        gradeCountElements[2].textContent = `${distribution.C}门`;
+        gradeCountElements[3].textContent = `${distribution.D}门`;
+        gradeCountElements[4].textContent = `${distribution.F}门`;
+      }
+      
+      // 更新学习表现趋势图表
+      function updatePerformanceTrend(trendData) {
+        // 这里简化处理，实际项目中可能需要使用图表库
+        const svgPath = document.querySelector('svg path[fill="none"]');
+        const areaPath = document.querySelector('svg path[fill="rgba(67, 97, 238, 0.1)"]');
+        const circles = document.querySelectorAll('svg circle');
+        
+        // 计算SVG路径
+        const svgWidth = 400;
+        const svgHeight = 200;
+        const padding = 20;
+        const xScale = (svgWidth - padding * 2) / (trendData.length - 1);
+        const minScore = Math.min(...trendData.map(item => item.score)) - 5;
+        const maxScore = Math.max(...trendData.map(item => item.score)) + 5;
+        const yScale = (svgHeight - padding * 2) / (maxScore - minScore);
+        
+        // 构建路径数据
+        let pathData = '';
+        let areaPathData = '';
+        
+        trendData.forEach((item, index) => {
+          const x = padding + index * xScale;
+          const y = svgHeight - padding - (item.score - minScore) * yScale;
+          
+          if (index === 0) {
+            pathData = `M${x},${y}`;
+            areaPathData = `M${x},${svgHeight - padding} L${x},${y}`;
+          } else {
+            pathData += ` L${x},${y}`;
+            areaPathData += ` L${x},${y}`;
+          }
+          
+          // 更新数据点
+          if (circles[index]) {
+            circles[index].setAttribute('cx', x);
+            circles[index].setAttribute('cy', y);
+          }
+        });
+        
+        // 完成区域路径
+        areaPathData += ` L${padding + (trendData.length - 1) * xScale},${svgHeight - padding} Z`;
+        
+        // 更新路径
+        svgPath.setAttribute('d', pathData);
+        areaPath.setAttribute('d', areaPathData);
+      }
+      
+      // 更新成绩表格
+      function updateGradeTable(courses) {
+        // 清空表格内容
+        gradeTableBody.innerHTML = '';
+        
+        // 遍历课程数据，创建表格行
+        courses.forEach(course => {
+          const row = document.createElement('tr');
+          row.className = 'hover:bg-gray-50';
+          
+          // 确定成绩等级样式
+          let gradeClass = '';
+          if (course.grade === 'A') gradeClass = 'bg-green-100 text-green-800';
+          else if (course.grade === 'B') gradeClass = 'bg-yellow-100 text-yellow-800';
+          else if (course.grade === 'C') gradeClass = 'bg-orange-100 text-orange-800';
+          else if (course.grade === 'D') gradeClass = 'bg-red-100 text-red-800';
+          else if (course.grade === 'F') gradeClass = 'bg-gray-100 text-gray-800';
+          
+          // 确定课程状态样式
+          let statusClass = '';
+          if (course.status === 'completed') statusClass = 'bg-green-100 text-green-800';
+          else if (course.status === 'in-progress') statusClass = 'bg-blue-100 text-blue-800';
+          
+          // 创建表格行内容
+          row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">${course.name}</div>
+                  <div class="text-xs text-gray-500">${course.instructor}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${course.credits}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${course.dailyScore}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${course.quizScore}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${course.examScore || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="text-sm font-medium text-gray-900">${course.totalScore}</div>
+                ${course.status === 'in-progress' ? '<span class="ml-2 text-xs text-blue-600 font-medium">待更新</span>' : ''}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${course.grade ? `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${gradeClass}">${course.grade}</span>` : '<span class="text-sm text-gray-500">-</span>'}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${course.status === 'completed' ? '<span class="text-sm text-gray-500">已完成</span>' : `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">进行中</span>`}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button class="grade-detail-btn text-primary hover:text-primary/80" data-course-id="${course.id}">查看详情</button>
+            </td>
+          `;
+          
+          gradeTableBody.appendChild(row);
+        });
+        
+        // 重新绑定成绩详情按钮事件
+        document.querySelectorAll('.grade-detail-btn').forEach(button => {
+          button.addEventListener('click', function() {
+            const courseId = this.getAttribute('data-course-id');
+            showGradeDetail(courseId);
+          });
+        });
+      }
+      
+      // 更新学习建议
+      function updateLearningSuggestions(suggestions) {
+        const suggestionsList = document.querySelector('.mt-2.text-sm.text-gray-600 ul');
+        
+        // 清空学习建议列表
+        suggestionsList.innerHTML = '';
+        
+        // 遍历学习建议，创建列表项
+        suggestions.forEach(suggestion => {
+          const li = document.createElement('li');
+          li.className = 'list-disc pl-5 space-y-2';
+          
+          li.innerHTML = `<span class="font-medium">${suggestion.course}</span>：${suggestion.content}`;
+          
+          suggestionsList.appendChild(li);
+        });
+      }
+      
+      // 显示成绩详情
+      function showGradeDetail(courseId) {
+        // 显示加载指示器
+        showLoading();
+        
+        // 获取模态框内容区域
+        const modalBody = gradeDetailModal.querySelector('.modal-body');
+        
+        // 模拟API请求获取成绩详情数据
+        setTimeout(() => {
+          // 实际项目中，这里应该是一个真实的API调用
+          // 这里使用模拟数据进行演示
+          const gradeDetail = {
+            courseName: '高等数学',
+            instructor: '李教授',
+            semester: '2023-2024学年第一学期',
+            totalScore: 78,
+            credits: 4,
+            scoreBreakdown: [
+              { name: '平时成绩', value: 82, weight: 30 },
+              { name: '测验成绩', value: 75, weight: 20 },
+              { name: '期中考试', value: 80, weight: 25 },
+              { name: '期末考试', value: 0, weight: 25 },
+            ],
+            assignmentScores: [
+              { name: '作业1', score: 90, date: '2023-09-15' },
+              { name: '作业2', score: 85, date: '2023-09-22' },
+              { name: '作业3', score: 82, date: '2023-09-29' },
+              { name: '测验1', score: 75, date: '2023-10-13' },
+              { name: '期中考试', score: 80, date: '2023-11-10' },
+            ],
+            suggestions: [
+              '加强极限计算相关知识点的学习',
+              '多做练习，提高解题速度和准确率',
+              '定期复习，巩固已学知识',
+              '积极参与课堂讨论，及时解决疑问'
+            ]
+          };
+          
+          // 构建成绩详情内容
+          let contentHTML = `
+            <div class="mb-4">
+              <h3 class="text-lg font-bold text-gray-900">${gradeDetail.courseName}</h3>
+              <p class="text-sm text-gray-500">${gradeDetail.instructor} | ${gradeDetail.semester} | ${gradeDetail.credits}学分</p>
+            </div>
+            
+            <div class="mb-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-gray-500">总成绩</span>
+                <span class="text-xl font-bold text-gray-900">${gradeDetail.totalScore}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-primary h-2 rounded-full" style="width: ${gradeDetail.totalScore}%"></div>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <h4 class="text-sm font-medium text-gray-900 mb-2">成绩构成</h4>
+              <div class="space-y-2">
+          `;
+          
+          gradeDetail.scoreBreakdown.forEach(item => {
+            contentHTML += `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <span class="text-sm text-gray-600">${item.name}</span>
+                  <span class="ml-2 text-xs text-gray-500">(${item.weight}%)</span>
+                </div>
+                <span class="text-sm font-medium text-gray-900">${item.value}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-1.5">
+                <div class="bg-blue-500 h-1.5 rounded-full" style="width: ${item.value}%"></div>
+              </div>
+            `;
+          });
+          
+          contentHTML += `
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <h4 class="text-sm font-medium text-gray-900 mb-2">作业与测验成绩</h4>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目</th>
+                      <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">成绩</th>
+                      <th scope="col" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+            `;
+          
+          gradeDetail.assignmentScores.forEach(item => {
+            contentHTML += `
+              <tr>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${item.name}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${item.score}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-500">${item.date}</td>
+              </tr>
+            `;
+          });
+          
+          contentHTML += `
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div>
+              <h4 class="text-sm font-medium text-gray-900 mb-2">学习建议</h4>
+              <ul class="text-sm text-gray-600 space-y-1">
+            `;
+          
+          gradeDetail.suggestions.forEach(suggestion => {
+            contentHTML += `
+              <li class="flex items-start">
+                <i class="fa fa-check-circle text-green-500 mt-0.5 mr-2"></i>
+                <span>${suggestion}</span>
+              </li>
+            `;
+          });
+          
+          contentHTML += `
+              </ul>
+            </div>
+          `;
+          
+          // 设置模态框内容
+          modalBody.innerHTML = contentHTML;
+          
+          // 显示模态框
+          gradeDetailModal.classList.remove('hidden');
+          
+          // 隐藏加载指示器
+          hideLoading();
+        }, 1000);
+      }
+      
+      // 显示学习路径推荐
+      function showLearningRecommendation() {
+        // 显示加载指示器
+        showLoading();
+        
+        // 获取模态框内容区域
+        const modalBody = recommendationModal.querySelector('.modal-body');
+        
+        // 模拟API请求获取推荐数据
+        setTimeout(() => {
+          // 实际项目中，这里应该是一个真实的API调用
+          // 这里使用模拟数据进行演示
+          const recommendations = [
+            {
+              id: 'path-1',
+              title: '数学学习路径',
+              description: '针对高等数学表现需要提升的情况，推荐以下学习路径：',
+              courses: [
+                { name: '极限与连续', priority: '高', estimatedTime: '20小时' },
+                { name: '导数与微分', priority: '中', estimatedTime: '15小时' },
+                { name: '微分中值定理', priority: '低', estimatedTime: '10小时' },
+                { name: '不定积分', priority: '高', estimatedTime: '25小时' },
+              ]
+            },
+            {
+              id: 'path-2',
+              title: '学习方法优化',
+              description: '基于你的学习表现，建议优化以下学习方法：',
+              methods: [
+                { name: '定期复习', description: '每周花2小时复习本周学习内容' },
+                { name: '解题练习', description: '每章节完成至少30道练习题' },
+                { name: '错题整理', description: '建立错题本，定期回顾' },
+                { name: '小组讨论', description: '加入学习小组，互相帮助' },
+              ]
+            }
+          ];
+          
+          // 构建推荐内容
+          let contentHTML = '';
+          
+          recommendations.forEach(recommendation => {
+            contentHTML += `
+              <div class="mb-6 last:mb-0">
+                <h3 class="text-base font-bold text-gray-900 mb-2">${recommendation.title}</h3>
+                <p class="text-sm text-gray-600 mb-3">${recommendation.description}</p>
+                
+                <div class="space-y-2">
+            `;
+            
+            if (recommendation.courses) {
+              recommendation.courses.forEach(course => {
+                const priorityClass = course.priority === '高' ? 'bg-red-100 text-red-800' : 
+                                    course.priority === '中' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800';
+                
+                contentHTML += `
+                  <div class="flex items-center justify-between p-2 border border-gray-200 rounded">
+                    <div class="flex items-center">
+                      <span class="px-2 py-0.5 text-xs font-medium rounded-full ${priorityClass} mr-2">${course.priority}优先级</span>
+                      <span class="text-sm text-gray-900">${course.name}</span>
+                    </div>
+                    <span class="text-xs text-gray-500">${course.estimatedTime}</span>
+                  </div>
+                `;
+              });
+            }
+            
+            if (recommendation.methods) {
+              recommendation.methods.forEach(method => {
+                contentHTML += `
+                  <div class="p-2 border border-gray-200 rounded">
+                    <div class="font-medium text-sm text-gray-900 mb-1">${method.name}</div>
+                    <p class="text-xs text-gray-600">${method.description}</p>
+                  </div>
+                `;
+              });
+            }
+            
+            contentHTML += `
+                </div>
+              </div>
+            `;
+          });
+          
+          // 设置模态框内容
+          modalBody.innerHTML = contentHTML;
+          
+          // 显示模态框
+          recommendationModal.classList.remove('hidden');
+          
+          // 隐藏加载指示器
+          hideLoading();
+        }, 1000);
+      }
+      
+      // 学期筛选
+      semesterSelect.addEventListener('change', function() {
+        const selectedSemester = this.value;
+        // 根据选择的学期加载对应的成绩数据
+        filterGradesBySemester(selectedSemester);
+      });
+      
+      // 根据学期筛选成绩
+      function filterGradesBySemester(semester) {
+        // 显示加载指示器
+        showLoading();
+        
+        // 模拟API请求获取筛选后的成绩数据
+        setTimeout(() => {
+          // 实际项目中，这里应该是一个真实的API调用
+          // 这里简单模拟筛选效果
+          loadGradeData();
+          
+          // 显示通知
+          showNotification(`已加载${semester}的成绩数据`, 'success');
+        }, 1000);
+      }
+      
+      // 成绩分布图表切换
+      gradeDistributionTab1.addEventListener('click', function() {
+        gradeDistributionTab1.className = 'px-3 py-1 text-xs font-medium rounded-md text-white bg-primary hover:bg-primary/90';
+        gradeDistributionTab2.className = 'px-3 py-1 text-xs font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50';
+        // 这里可以实现按分数段显示图表的逻辑
+        showNotification('已切换为按分数段显示', 'info');
+      });
+      
+      gradeDistributionTab2.addEventListener('click', function() {
+        gradeDistributionTab2.className = 'px-3 py-1 text-xs font-medium rounded-md text-white bg-primary hover:bg-primary/90';
+        gradeDistributionTab1.className = 'px-3 py-1 text-xs font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50';
+        // 这里可以实现按等级显示图表的逻辑
+        showNotification('已切换为按等级显示', 'info');
+      });
+      
+      // 学习表现趋势图表切换
+      performanceTrendTab1.addEventListener('click', function() {
+        performanceTrendTab1.className = 'px-3 py-1 text-xs font-medium rounded-md text-white bg-primary hover:bg-primary/90';
+        performanceTrendTab2.className = 'px-3 py-1 text-xs font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50';
+        // 这里可以实现显示本学期趋势的逻辑
+        showNotification('已切换为显示本学期趋势', 'info');
+      });
+      
+      performanceTrendTab2.addEventListener('click', function() {
+        performanceTrendTab2.className = 'px-3 py-1 text-xs font-medium rounded-md text-white bg-primary hover:bg-primary/90';
+        performanceTrendTab1.className = 'px-3 py-1 text-xs font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50';
+        // 这里可以实现显示全年趋势的逻辑
+        showNotification('已切换为显示全年趋势', 'info');
+      });
+      
+      // 打开智能助手
+      chatBotButton.addEventListener('click', function() {
+        // 显示加载指示器
+        showLoading();
+        
+        // 模拟加载聊天内容
+        setTimeout(() => {
+          // 显示聊天机器人模态框
+          chatBotModal.classList.remove('hidden');
+          
+          // 隐藏加载指示器
+          hideLoading();
+        }, 500);
+      });
+      
+      // 打开学习路径推荐
+      recommendationButton.addEventListener('click', function() {
+        showLearningRecommendation();
+      });
+      
+      // 关闭成绩详情模态框
+      gradeDetailModalClose.forEach(button => {
+        button.addEventListener('click', function() {
+          gradeDetailModal.classList.add('hidden');
+        });
+      });
+      
+      // 关闭学习路径推荐模态框
+      recommendationModalClose.forEach(button => {
+        button.addEventListener('click', function() {
+          recommendationModal.classList.add('hidden');
+        });
+      });
+      
+      // 关闭聊天机器人模态框
+      chatBotModalClose.forEach(button => {
+        button.addEventListener('click', function() {
+          chatBotModal.classList.add('hidden');
+        });
+      });
+      
+      // 点击模态框外部关闭模态框
+      window.addEventListener('click', function(event) {
+        if (event.target === gradeDetailModal) {
+          gradeDetailModal.classList.add('hidden');
+        }
+        if (event.target === recommendationModal) {
+          recommendationModal.classList.add('hidden');
+        }
+        if (event.target === chatBotModal) {
+          chatBotModal.classList.add('hidden');
+        }
+      });
+      
+      // 辅助函数：显示加载指示器
+      function showLoading() {
+        if (loadingIndicator) {
+          loadingIndicator.classList.remove('hidden');
+        }
+      }
+      
+      // 辅助函数：隐藏加载指示器
+      function hideLoading() {
+        if (loadingIndicator) {
+          loadingIndicator.classList.add('hidden');
+        }
+      }
+      
+      // 辅助函数：显示通知
+      function showNotification(message, type = 'info') {
+        // 创建通知元素
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full';
+        notification.textContent = message;
+        
+        // 设置通知样式
+        if (type === 'success') {
+          notification.classList.add('bg-green-500', 'text-white');
+        } else if (type === 'error') {
+          notification.classList.add('bg-red-500', 'text-white');
+        } else {
+          notification.classList.add('bg-blue-500', 'text-white');
+        }
+        
+        // 添加到页面
+        document.body.appendChild(notification);
+        
+        // 显示通知
+        setTimeout(() => {
+          notification.classList.remove('translate-x-full');
+          notification.classList.add('translate-x-0');
+        }, 10);
+        
+        // 3秒后隐藏通知
+        setTimeout(() => {
+          notification.classList.add('translate-x-full');
+          notification.classList.remove('translate-x-0');
+          // 通知消失后移除元素
+          setTimeout(() => {
+            document.body.removeChild(notification);
+          }, 300);
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理员控制面板 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- 顶部导航栏 -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center">
+          <a href="#" class="flex-shrink-0 flex items-center">
+            <i class="fa fa-graduation-cap text-primary text-2xl mr-2"></i>
+            <span class="font-bold text-lg text-primary">学习路径系统</span>
+          </a>
+          
+          <!-- 导航链接 - 中等屏幕以上显示 -->
+          <div class="hidden md:ml-10 md:flex md:space-x-8">
+            <a href="admin_dashboard.html" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-tachometer mr-2"></i>
+              总览
+            </a>
+            <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-users mr-2"></i>
+              用户管理
+            </a>
+            <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-book mr-2"></i>
+              课程管理
+            </a>
+            <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-cogs mr-2"></i>
+              系统设置
+            </a>
+          </div>
+        </div>
+        
+        <!-- 右侧用户信息和操作 -->
+        <div class="flex items-center">
+          <!-- 搜索框 -->
+          <div class="hidden md:block">
+            <div class="ml-3 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fa fa-search text-gray-400"></i>
+              </div>
+              <input class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary" placeholder="搜索...">
+            </div>
+          </div>
+          
+          <!-- 通知图标 -->
+          <div class="ml-3 relative">
+            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-bell text-xl"></i>
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">12</span>
+            </button>
+          </div>
+          
+          <!-- 用户头像 -->
+          <div class="ml-3 relative">
+            <div class="flex items-center">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/1001/200/200" alt="管理员头像">
+              <span class="ml-2 text-sm font-medium text-gray-700">管理员</span>
+              <i class="fa fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- 页面标题和操作 -->
+    <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">系统总览</h1>
+        <p class="text-gray-600 mt-1">查看系统整体运行状态和关键指标</p>
+      </div>
+      <div class="mt-4 md:mt-0 flex space-x-3">
+        <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          <i class="fa fa-download mr-2"></i>
+          导出报告
+        </button>
+        <div class="relative">
+          <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fa fa-calendar mr-2"></i>
+            最近30天
+            <i class="fa fa-chevron-down ml-2 text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 系统关键指标卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <!-- 学生总数 -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden card-hover">
+        <div class="p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+              <i class="fa fa-user-circle text-primary text-xl"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">学生总数</dt>
+                <dd>
+                  <div class="text-lg font-semibold text-gray-900">2,856</div>
+                  <div class="text-xs text-green-500 flex items-center mt-1">
+                    <i class="fa fa-arrow-up mr-1"></i>
+                    <span>8.2% 较上月</span>
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 教师总数 -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden card-hover">
+        <div class="p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-purple-100 rounded-md p-3">
+              <i class="fa fa-users text-purple-500 text-xl"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">教师总数</dt>
+                <dd>
+                  <div class="text-lg font-semibold text-gray-900">148</div>
+                  <div class="text-xs text-green-500 flex items-center mt-1">
+                    <i class="fa fa-arrow-up mr-1"></i>
+                    <span>3.5% 较上月</span>
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 课程总数 -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden card-hover">
+        <div class="p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
+              <i class="fa fa-book text-green-500 text-xl"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">课程总数</dt>
+                <dd>
+                  <div class="text-lg font-semibold text-gray-900">324</div>
+                  <div class="text-xs text-green-500 flex items-center mt-1">
+                    <i class="fa fa-arrow-up mr-1"></i>
+                    <span>12.3% 较上月</span>
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 活跃用户 -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden card-hover">
+        <div class="p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-yellow-100 rounded-md p-3">
+              <i class="fa fa-bolt text-yellow-500 text-xl"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">今日活跃用户</dt>
+                <dd>
+                  <div class="text-lg font-semibold text-gray-900">1,872</div>
+                  <div class="text-xs text-red-500 flex items-center mt-1">
+                    <i class="fa fa-arrow-down mr-1"></i>
+                    <span>2.1% 较昨日</span>
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 图表和统计数据 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <!-- 学习活跃度趋势 -->
+      <div class="lg:col-span-2 bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">学习活跃度趋势</h2>
+          <div class="flex space-x-2">
+            <button class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-primary hover:bg-blue-200 focus:outline-none">
+              周
+            </button>
+            <button class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none">
+              月
+            </button>
+            <button class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none">
+              年
+            </button>
+          </div>
+        </div>
+        <div class="h-80">
+          <!-- 模拟活跃度图表 -->
+          <svg class="w-full h-full" viewBox="0 0 600 300">
+            <!-- 坐标轴 -->
+            <line x1="50" y1="250" x2="550" y2="250" stroke="#e5e7eb" stroke-width="1"/>
+            <line x1="50" y1="250" x2="50" y2="30" stroke="#e5e7eb" stroke-width="1"/>
+            
+            <!-- 网格线 -->
+            <line x1="50" y1="200" x2="550" y2="200" stroke="#f3f4f6" stroke-width="1"/>
+            <line x1="50" y1="150" x2="550" y2="150" stroke="#f3f4f6" stroke-width="1"/>
+            <line x1="50" y1="100" x2="550" y2="100" stroke="#f3f4f6" stroke-width="1"/>
+            <line x1="50" y1="50" x2="550" y2="50" stroke="#f3f4f6" stroke-width="1"/>
+            
+            <!-- 折线图 -->
+            <path d="M50,200 L100,180 L150,140 L200,190 L250,120 L300,160 L350,100 L400,90 L450,130 L500,70 L550,60" fill="none" stroke="#4361ee" stroke-width="3"/>
+            
+            <!-- 点 -->
+            <circle cx="50" cy="200" r="4" fill="#4361ee"/>
+            <circle cx="100" cy="180" r="4" fill="#4361ee"/>
+            <circle cx="150" cy="140" r="4" fill="#4361ee"/>
+            <circle cx="200" cy="190" r="4" fill="#4361ee"/>
+            <circle cx="250" cy="120" r="4" fill="#4361ee"/>
+            <circle cx="300" cy="160" r="4" fill="#4361ee"/>
+            <circle cx="350" cy="100" r="4" fill="#4361ee"/>
+            <circle cx="400" cy="90" r="4" fill="#4361ee"/>
+            <circle cx="450" cy="130" r="4" fill="#4361ee"/>
+            <circle cx="500" cy="70" r="4" fill="#4361ee"/>
+            <circle cx="550" cy="60" r="4" fill="#4361ee"/>
+            
+            <!-- X轴标签 -->
+            <text x="50" y="270" text-anchor="middle" font-size="12" fill="#6b7280">周一</text>
+            <text x="150" y="270" text-anchor="middle" font-size="12" fill="#6b7280">周二</text>
+            <text x="250" y="270" text-anchor="middle" font-size="12" fill="#6b7280">周三</text>
+            <text x="350" y="270" text-anchor="middle" font-size="12" fill="#6b7280">周四</text>
+            <text x="450" y="270" text-anchor="middle" font-size="12" fill="#6b7280">周五</text>
+            <text x="550" y="270" text-anchor="middle" font-size="12" fill="#6b7280">周六</text>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- 系统资源使用情况 -->
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">系统资源使用</h2>
+          <button class="text-gray-400 hover:text-gray-500 focus:outline-none">
+            <i class="fa fa-refresh"></i>
+          </button>
+        </div>
+        
+        <!-- CPU使用率 -->
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-700">CPU使用率</span>
+            <span class="text-sm text-gray-500">38%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-blue-500 h-2.5 rounded-full" style="width: 38%"></div>
+          </div>
+        </div>
+        
+        <!-- 内存使用率 -->
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-700">内存使用率</span>
+            <span class="text-sm text-gray-500">62%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 62%"></div>
+          </div>
+        </div>
+        
+        <!-- 磁盘空间 -->
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-700">磁盘空间</span>
+            <span class="text-sm text-gray-500">23%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-green-500 h-2.5 rounded-full" style="width: 23%"></div>
+          </div>
+        </div>
+        
+        <!-- 网络流量 -->
+        <div class="mb-6">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-700">网络流量</span>
+            <span class="text-sm text-gray-500">1.2GB/30GB</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-purple-500 h-2.5 rounded-full" style="width: 4%"></div>
+          </div>
+        </div>
+        
+        <!-- 数据库连接 -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-700">数据库连接</span>
+            <span class="text-sm text-gray-500">128/250</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-red-500 h-2.5 rounded-full" style="width: 51%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 最近活动和系统通知 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 最近活动 -->
+      <div class="lg:col-span-2 bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">最近活动</h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+          <!-- 活动1 -->
+          <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <img class="h-10 w-10 rounded-full object-cover" src="https://picsum.photos/id/1027/200/200" alt="用户头像">
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-900">
+                  <span class="font-medium">李小华</span> 提交了作业 <span class="text-primary">高等数学第一次作业</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-1">今天 14:30</p>
+              </div>
+              <div class="ml-auto flex-shrink-0">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-primary">
+                  作业提交
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 活动2 -->
+          <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <img class="h-10 w-10 rounded-full object-cover" src="https://picsum.photos/id/1005/200/200" alt="用户头像">
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-900">
+                  <span class="font-medium">李教授</span> 创建了新课程 <span class="text-primary">概率论与数理统计</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-1">今天 10:15</p>
+              </div>
+              <div class="ml-auto flex-shrink-0">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                  课程创建
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 活动3 -->
+          <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <img class="h-10 w-10 rounded-full object-cover" src="https://picsum.photos/id/1012/200/200" alt="用户头像">
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-900">
+                  <span class="font-medium">王小明</span> 完成了测验 <span class="text-primary">线性代数单元测验</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-1">昨天 16:45</p>
+              </div>
+              <div class="ml-auto flex-shrink-0">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                  测验完成
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 活动4 -->
+          <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <img class="h-10 w-10 rounded-full object-cover" src="https://picsum.photos/id/1066/200/200" alt="用户头像">
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-900">
+                  <span class="font-medium">赵小刚</span> 加入了课程 <span class="text-primary">离散数学</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-1">昨天 09:30</p>
+              </div>
+              <div class="ml-auto flex-shrink-0">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                  加入课程
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 活动5 -->
+          <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <img class="h-10 w-10 rounded-full object-cover" src="https://picsum.photos/id/1001/200/200" alt="用户头像">
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-900">
+                  <span class="font-medium">管理员</span> 系统更新至版本 <span class="text-primary">v2.1.0</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-1">2天前</p>
+              </div>
+              <div class="ml-auto flex-shrink-0">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                  系统更新
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <a href="#" class="text-sm font-medium text-primary hover:text-primary/80 flex items-center justify-center">
+            查看更多活动
+            <i class="fa fa-chevron-right ml-1 text-xs"></i>
+          </a>
+        </div>
+      </div>
+      
+      <!-- 系统通知 -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">系统通知</h2>
+        </div>
+        <div class="p-6 space-y-4">
+          <!-- 通知1 -->
+          <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fa fa-exclamation-circle text-red-500"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-red-700">服务器内存使用率超过60%，建议增加内存或清理不必要的进程。</p>
+                <p class="text-xs text-red-600 mt-1">今天 15:20</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 通知2 -->
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fa fa-warning text-yellow-500"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700">有12名学生连续3天未登录系统，存在学习风险。</p>
+                <p class="text-xs text-yellow-600 mt-1">今天 10:15</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 通知3 -->
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-md">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fa fa-info-circle text-blue-500"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-blue-700">系统将于下周二晚22:00-次日02:00进行例行维护，请提前做好准备。</p>
+                <p class="text-xs text-blue-600 mt-1">昨天 14:30</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 通知4 -->
+          <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fa fa-check-circle text-green-500"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-green-700">机器学习模型训练完成，新模型已上线，学习路径推荐准确率提升15%。</p>
+                <p class="text-xs text-green-600 mt-1">2天前</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <a href="#" class="text-sm font-medium text-primary hover:text-primary/80 flex items-center justify-center">
+            查看所有通知
+            <i class="fa fa-chevron-right ml-1 text-xs"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-500">
+        © 2025 个性化学习路径的在线课程管理系统 | 版权所有
+      </p>
+    </div>
+  </footer>
+
+  <!-- 引入JavaScript -->
+  <script src="../assets/js/backend.js"></script>
+  <script src="../assets/js/script.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查用户是否已登录
+      if (!backend.isLoggedIn() || backend.getCurrentUser().role !== 'admin') {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const user = backend.getCurrentUser();
+      
+      // 更新用户头像和名称
+      const userAvatar = document.querySelector('img.h-8.w-8.rounded-full.object-cover');
+      const userName = document.querySelector('img.h-8.w-8.rounded-full.object-cover + span');
+      if (userAvatar && userName) {
+        userName.textContent = user.name || '管理员';
+      }
+      
+      // 加载系统统计数据
+      loadSystemStats();
+      
+      // 加载学习活跃度趋势
+      loadActivityTrends('week');
+      
+      // 加载系统资源使用情况
+      loadSystemResources();
+      
+      // 加载最近活动
+      loadRecentActivities();
+      
+      // 加载系统通知
+      loadSystemNotifications();
+      
+      // 添加时间范围选择事件
+      const timeRangeButtons = document.querySelectorAll('.bg-white.rounded-lg.shadow-sm.p-6:first-child .flex.space-x-2 button');
+      timeRangeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // 移除所有按钮的选中状态
+          timeRangeButtons.forEach(btn => {
+            btn.className = 'inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none';
+          });
+          
+          // 设置当前按钮为选中状态
+          this.className = 'inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-blue-100 text-primary hover:bg-blue-200 focus:outline-none';
+          
+          // 获取时间范围
+          let range = 'week';
+          if (this.textContent.trim() === '月') range = 'month';
+          if (this.textContent.trim() === '年') range = 'year';
+          
+          // 重新加载数据
+          loadActivityTrends(range);
+        });
+      });
+      
+      // 导出报告按钮事件
+      const exportReportButton = document.querySelector('.inline-flex.items-center.px-4.py-2.border.border-transparent.text-sm.font-medium.rounded-md.shadow-sm.text-white.bg-primary');
+      if (exportReportButton) {
+        exportReportButton.addEventListener('click', function() {
+          exportSystemReport();
+        });
+      }
+      
+      // 刷新按钮事件
+      const refreshButton = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .flex.items-center.justify-between button');
+      if (refreshButton) {
+        refreshButton.addEventListener('click', function() {
+          loadSystemResources();
+        });
+      }
+      
+      // 登出功能
+      const userProfile = document.querySelector('.ml-3.relative .flex.items-center');
+      if (userProfile) {
+        userProfile.addEventListener('click', function() {
+          if (confirm('确定要退出登录吗？')) {
+            backend.logout();
+            window.location.href = 'login.html';
+          }
+        });
+      }
+    });
+    
+    // 加载系统统计数据
+    async function loadSystemStats() {
+      try {
+        // 显示加载状态
+        showLoadingState(true);
+        
+        const statsResult = await backend.getSystemStats();
+        
+        if (statsResult.success) {
+          const stats = statsResult.data;
+          
+          // 更新统计卡片
+          updateStatsCards(stats);
+        } else {
+          console.error('Failed to load system stats');
+        }
+      } catch (error) {
+        console.error('Error loading system stats:', error);
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 更新统计卡片
+    function updateStatsCards(stats) {
+      const statCards = document.querySelectorAll('.grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4.gap-6 .bg-white.rounded-lg.shadow-sm.overflow-hidden');
+      
+      // 学生总数卡片
+      if (statCards[0]) {
+        const countElement = statCards[0].querySelector('.text-lg.font-semibold.text-gray-900');
+        const changeElement = statCards[0].querySelector('.text-xs.text-green-500 span');
+        
+        if (countElement && changeElement) {
+          countElement.textContent = stats.studentsCount.toLocaleString();
+          changeElement.textContent = `${stats.studentsGrowthRate}% 较上月`;
+        }
+      }
+      
+      // 教师总数卡片
+      if (statCards[1]) {
+        const countElement = statCards[1].querySelector('.text-lg.font-semibold.text-gray-900');
+        const changeElement = statCards[1].querySelector('.text-xs.text-green-500 span');
+        
+        if (countElement && changeElement) {
+          countElement.textContent = stats.teachersCount.toLocaleString();
+          changeElement.textContent = `${stats.teachersGrowthRate}% 较上月`;
+        }
+      }
+      
+      // 课程总数卡片
+      if (statCards[2]) {
+        const countElement = statCards[2].querySelector('.text-lg.font-semibold.text-gray-900');
+        const changeElement = statCards[2].querySelector('.text-xs.text-green-500 span');
+        
+        if (countElement && changeElement) {
+          countElement.textContent = stats.coursesCount.toLocaleString();
+          changeElement.textContent = `${stats.coursesGrowthRate}% 较上月`;
+        }
+      }
+      
+      // 今日活跃用户卡片
+      if (statCards[3]) {
+        const countElement = statCards[3].querySelector('.text-lg.font-semibold.text-gray-900');
+        const changeElement = statCards[3].querySelector('.text-xs.text-red-500 span');
+        const changeIcon = statCards[3].querySelector('.text-xs.text-red-500 i');
+        
+        if (countElement && changeElement && changeIcon) {
+          countElement.textContent = stats.activeUsersToday.toLocaleString();
+          
+          // 根据变化趋势更新样式
+          if (stats.activeUsersChange > 0) {
+            changeElement.className = 'text-xs text-green-500';
+            changeIcon.className = 'fa fa-arrow-up mr-1 text-green-500';
+            changeElement.textContent = `+${stats.activeUsersChange}% 较昨日`;
+          } else {
+            changeElement.className = 'text-xs text-red-500';
+            changeIcon.className = 'fa fa-arrow-down mr-1 text-red-500';
+            changeElement.textContent = `${stats.activeUsersChange}% 较昨日`;
+          }
+        }
+      }
+    }
+    
+    // 加载学习活跃度趋势
+    async function loadActivityTrends(range) {
+      try {
+        // 显示加载状态
+        showLoadingState(true);
+        
+        const trendsResult = await backend.getActivityTrends(range);
+        
+        if (trendsResult.success) {
+          const trends = trendsResult.data;
+          
+          // 绘制活跃度图表
+          drawActivityChart(trends);
+        } else {
+          console.error('Failed to load activity trends');
+        }
+      } catch (error) {
+        console.error('Error loading activity trends:', error);
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 绘制活跃度图表
+    function drawActivityChart(trends) {
+      const chartContainer = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:first-child .h-80 svg');
+      if (chartContainer) {
+        // 清空现有内容
+        chartContainer.innerHTML = '';
+        
+        // 图表配置
+        const width = 600;
+        const height = 300;
+        const margin = 50;
+        const chartWidth = width - 2 * margin;
+        const chartHeight = height - 80;
+        
+        // 设置 viewBox
+        chartContainer.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        
+        // 绘制坐标轴
+        const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        xAxis.setAttribute('x1', margin);
+        xAxis.setAttribute('y1', height - margin);
+        xAxis.setAttribute('x2', width - margin);
+        xAxis.setAttribute('y2', height - margin);
+        xAxis.setAttribute('stroke', '#e5e7eb');
+        xAxis.setAttribute('stroke-width', '1');
+        chartContainer.appendChild(xAxis);
+        
+        const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        yAxis.setAttribute('x1', margin);
+        yAxis.setAttribute('y1', height - margin);
+        yAxis.setAttribute('x2', margin);
+        yAxis.setAttribute('y2', margin);
+        yAxis.setAttribute('stroke', '#e5e7eb');
+        yAxis.setAttribute('stroke-width', '1');
+        chartContainer.appendChild(yAxis);
+        
+        // 绘制网格线
+        for (let i = 1; i <= 4; i++) {
+          const y = height - margin - (i * chartHeight / 4);
+          const gridLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          gridLine.setAttribute('x1', margin);
+          gridLine.setAttribute('y1', y);
+          gridLine.setAttribute('x2', width - margin);
+          gridLine.setAttribute('y2', y);
+          gridLine.setAttribute('stroke', '#f3f4f6');
+          gridLine.setAttribute('stroke-width', '1');
+          chartContainer.appendChild(gridLine);
+        }
+        
+        // 如果有数据，绘制折线图
+        if (trends && trends.length > 0) {
+          // 找出最大值用于归一化
+          const maxValue = Math.max(...trends.map(d => d.value));
+          const padding = maxValue * 0.1; // 添加10%的内边距
+          const normalizedMax = maxValue + padding;
+          
+          // 计算数据点坐标
+          const points = trends.map((point, index) => {
+            const x = margin + (index / (trends.length - 1)) * chartWidth;
+            const y = height - margin - (point.value / normalizedMax) * chartHeight;
+            return { x, y, value: point.value };
+          });
+          
+          // 绘制折线
+          const linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          let linePathData = `M${points[0].x},${points[0].y} ${points.slice(1).map(p => `L${p.x},${p.y}`).join(' ')}`;
+          linePath.setAttribute('d', linePathData);
+          linePath.setAttribute('fill', 'none');
+          linePath.setAttribute('stroke', '#4361ee');
+          linePath.setAttribute('stroke-width', '3');
+          linePath.setAttribute('stroke-linecap', 'round');
+          linePath.setAttribute('stroke-linejoin', 'round');
+          chartContainer.appendChild(linePath);
+          
+          // 绘制数据点
+          points.forEach(point => {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', point.x);
+            circle.setAttribute('cy', point.y);
+            circle.setAttribute('r', '4');
+            circle.setAttribute('fill', '#4361ee');
+            chartContainer.appendChild(circle);
+          });
+          
+          // 添加X轴标签
+          trends.forEach((point, index) => {
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('x', margin + (index / (trends.length - 1)) * chartWidth);
+            label.setAttribute('y', height - 20);
+            label.setAttribute('text-anchor', 'middle');
+            label.setAttribute('font-size', '12');
+            label.setAttribute('fill', '#6b7280');
+            label.textContent = point.label;
+            chartContainer.appendChild(label);
+          });
+          
+          // 添加Y轴标签
+          for (let i = 0; i <= 4; i++) {
+            const value = (normalizedMax / 4) * i;
+            const y = height - margin - (i * chartHeight / 4);
+            
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('x', margin - 10);
+            label.setAttribute('y', y + 4);
+            label.setAttribute('text-anchor', 'end');
+            label.setAttribute('font-size', '12');
+            label.setAttribute('fill', '#6b7280');
+            label.textContent = Math.round(value).toLocaleString();
+            chartContainer.appendChild(label);
+          }
+        }
+      }
+    }
+    
+    // 加载系统资源使用情况
+    async function loadSystemResources() {
+      try {
+        // 显示加载状态
+        showLoadingState(true);
+        
+        const resourcesResult = await backend.getSystemResources();
+        
+        if (resourcesResult.success) {
+          const resources = resourcesResult.data;
+          
+          // 更新资源使用情况
+          updateSystemResources(resources);
+        } else {
+          console.error('Failed to load system resources');
+        }
+      } catch (error) {
+        console.error('Error loading system resources:', error);
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 更新系统资源使用情况
+    function updateSystemResources(resources) {
+      // CPU使用率
+      const cpuBar = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:first-child .bg-blue-500');
+      const cpuText = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:first-child .text-sm.text-gray-500');
+      if (cpuBar && cpuText) {
+        cpuBar.style.width = `${resources.cpuUsage}%`;
+        cpuText.textContent = `${resources.cpuUsage}%`;
+      }
+      
+      // 内存使用率
+      const memoryBar = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:nth-child(2) .bg-yellow-500');
+      const memoryText = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:nth-child(2) .text-sm.text-gray-500');
+      if (memoryBar && memoryText) {
+        memoryBar.style.width = `${resources.memoryUsage}%`;
+        memoryText.textContent = `${resources.memoryUsage}%`;
+      }
+      
+      // 磁盘空间
+      const diskBar = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:nth-child(3) .bg-green-500');
+      const diskText = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:nth-child(3) .text-sm.text-gray-500');
+      if (diskBar && diskText) {
+        diskBar.style.width = `${resources.diskUsage}%`;
+        diskText.textContent = `${resources.diskUsage}%`;
+      }
+      
+      // 网络流量
+      const networkBar = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:nth-child(4) .bg-purple-500');
+      const networkText = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:nth-child(4) .text-sm.text-gray-500');
+      if (networkBar && networkText) {
+        const networkPercentage = (resources.networkUsed / resources.networkTotal) * 100;
+        networkBar.style.width = `${networkPercentage}%`;
+        networkText.textContent = `${formatBytes(resources.networkUsed)}/${formatBytes(resources.networkTotal)}`;
+      }
+      
+      // 数据库连接
+      const dbBar = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:nth-child(5) .bg-red-500');
+      const dbText = document.querySelector('.bg-white.rounded-lg.shadow-sm.p-6:last-child .mb-6:nth-child(5) .text-sm.text-gray-500');
+      if (dbBar && dbText) {
+        const dbPercentage = (resources.dbConnectionsUsed / resources.dbConnectionsTotal) * 100;
+        dbBar.style.width = `${dbPercentage}%`;
+        dbText.textContent = `${resources.dbConnectionsUsed}/${resources.dbConnectionsTotal}`;
+      }
+    }
+    
+    // 格式化字节大小
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // 加载最近活动
+    async function loadRecentActivities() {
+      try {
+        const activitiesResult = await backend.getSystemActivities();
+        
+        if (activitiesResult.success) {
+          const activities = activitiesResult.data;
+          
+          // 更新最近活动列表
+          updateRecentActivitiesList(activities);
+        } else {
+          console.error('Failed to load recent activities');
+        }
+      } catch (error) {
+        console.error('Error loading recent activities:', error);
+      }
+    }
+    
+    // 更新最近活动列表
+    function updateRecentActivitiesList(activities) {
+      const activitiesContainer = document.querySelector('.lg\:col-span-2.bg-white.rounded-lg.shadow-sm.overflow-hidden .divide-y.divide-gray-200');
+      if (activitiesContainer) {
+        // 清空现有内容
+        activitiesContainer.innerHTML = '';
+        
+        // 添加活动项
+        activities.forEach(activity => {
+          const activityItem = document.createElement('div');
+          activityItem.className = 'px-6 py-4 hover:bg-gray-50 transition-colors';
+          
+          // 确定活动类型样式
+          let activityTypeClass = 'bg-blue-100 text-primary';
+          let activityTypeText = '活动';
+          
+          if (activity.type === 'assignment_submit') {
+            activityTypeClass = 'bg-blue-100 text-primary';
+            activityTypeText = '作业提交';
+          } else if (activity.type === 'course_create') {
+            activityTypeClass = 'bg-green-100 text-green-800';
+            activityTypeText = '课程创建';
+          } else if (activity.type === 'quiz_complete') {
+            activityTypeClass = 'bg-purple-100 text-purple-800';
+            activityTypeText = '测验完成';
+          } else if (activity.type === 'course_join') {
+            activityTypeClass = 'bg-yellow-100 text-yellow-800';
+            activityTypeText = '加入课程';
+          } else if (activity.type === 'system_update') {
+            activityTypeClass = 'bg-gray-100 text-gray-800';
+            activityTypeText = '系统更新';
+          }
+          
+          activityItem.innerHTML = `
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <img class="h-10 w-10 rounded-full object-cover" src="${activity.userAvatar || 'https://picsum.photos/id/' + (activity.userId % 100) + '/200/200'}" alt="${activity.userName}">
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-900">
+                  <span class="font-medium">${activity.userName}</span> ${activity.action}
+                </p>
+                <p class="text-xs text-gray-500 mt-1">${activity.time}</p>
+              </div>
+              <div class="ml-auto flex-shrink-0">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full ${activityTypeClass}">
+                  ${activityTypeText}
+                </span>
+              </div>
+            </div>
+          `;
+          
+          activitiesContainer.appendChild(activityItem);
+          
+          // 添加分隔线
+          if (activities.indexOf(activity) < activities.length - 1) {
+            const divider = document.createElement('div');
+            divider.className = 'border-t border-gray-200';
+            activitiesContainer.appendChild(divider);
+          }
+        });
+      }
+    }
+    
+    // 加载系统通知
+    async function loadSystemNotifications() {
+      try {
+        const notificationsResult = await backend.getSystemNotifications();
+        
+        if (notificationsResult.success) {
+          const notifications = notificationsResult.data;
+          
+          // 更新系统通知列表
+          updateSystemNotificationsList(notifications);
+        } else {
+          console.error('Failed to load system notifications');
+        }
+      } catch (error) {
+        console.error('Error loading system notifications:', error);
+      }
+    }
+    
+    // 更新系统通知列表
+    function updateSystemNotificationsList(notifications) {
+      const notificationsContainer = document.querySelector('.bg-white.rounded-lg.shadow-sm.overflow-hidden:last-child .p-6.space-y-4');
+      if (notificationsContainer) {
+        // 清空现有内容
+        notificationsContainer.innerHTML = '';
+        
+        // 添加通知项
+        notifications.forEach(notification => {
+          const notificationItem = document.createElement('div');
+          
+          // 确定通知类型样式
+          let notificationClass = 'bg-blue-50 border-l-4 border-blue-400';
+          let notificationIcon = 'fa-info-circle text-blue-500';
+          let notificationTextClass = 'text-blue-700';
+          let notificationTimeClass = 'text-blue-600';
+          
+          if (notification.type === 'error') {
+            notificationClass = 'bg-red-50 border-l-4 border-red-400';
+            notificationIcon = 'fa-exclamation-circle text-red-500';
+            notificationTextClass = 'text-red-700';
+            notificationTimeClass = 'text-red-600';
+          } else if (notification.type === 'warning') {
+            notificationClass = 'bg-yellow-50 border-l-4 border-yellow-400';
+            notificationIcon = 'fa-warning text-yellow-500';
+            notificationTextClass = 'text-yellow-700';
+            notificationTimeClass = 'text-yellow-600';
+          } else if (notification.type === 'info') {
+            notificationClass = 'bg-blue-50 border-l-4 border-blue-400';
+            notificationIcon = 'fa-info-circle text-blue-500';
+            notificationTextClass = 'text-blue-700';
+            notificationTimeClass = 'text-blue-600';
+          } else if (notification.type === 'success') {
+            notificationClass = 'bg-green-50 border-l-4 border-green-400';
+            notificationIcon = 'fa-check-circle text-green-500';
+            notificationTextClass = 'text-green-700';
+            notificationTimeClass = 'text-green-600';
+          }
+          
+          notificationItem.className = `${notificationClass} p-4 rounded-md`;
+          notificationItem.innerHTML = `
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <i class="fa ${notificationIcon}"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm ${notificationTextClass}">${notification.message}</p>
+                <p class="text-xs ${notificationTimeClass} mt-1">${notification.time}</p>
+              </div>
+            </div>
+          `;
+          
+          notificationsContainer.appendChild(notificationItem);
+        });
+      }
+    }
+    
+    // 导出系统报告
+    async function exportSystemReport() {
+      try {
+        // 显示加载状态
+        showLoadingState(true);
+        
+        const result = await backend.exportSystemReport();
+        
+        if (result.success) {
+          alert('报告导出成功，文件已下载');
+        } else {
+          alert('报告导出失败，请稍后重试');
+        }
+      } catch (error) {
+        console.error('Error exporting system report:', error);
+        alert('报告导出失败，请稍后重试');
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 显示加载状态
+    function showLoadingState(show) {
+      const mainContent = document.querySelector('main');
+      let loadingElement = document.getElementById('loading-overlay');
+      
+      if (show) {
+        if (!loadingElement) {
+          loadingElement = document.createElement('div');
+          loadingElement.id = 'loading-overlay';
+          loadingElement.className = 'fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center';
+          loadingElement.innerHTML = `
+            <div class="text-center">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              <p class="mt-4 text-gray-600">加载中...</p>
+            </div>
+          `;
+          document.body.appendChild(loadingElement);
+        } else {
+          loadingElement.style.display = 'flex';
+        }
+        
+        if (mainContent) {
+          mainContent.style.opacity = '0.5';
+        }
+      } else {
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+        }
+        
+        if (mainContent) {
+          mainContent.style.opacity = '1';
+        }
+      }
+    }
+  </script>
+</body>
+</html>

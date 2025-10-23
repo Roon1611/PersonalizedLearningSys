@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能答疑机器人 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .message-bubble-user {
+        background-color: #4361ee;
+        color: white;
+        border-radius: 18px 18px 4px 18px;
+        align-self: flex-end;
+        max-width: 80%;
+      }
+      .message-bubble-bot {
+        background-color: #f3f4f6;
+        color: #374151;
+        border-radius: 18px 18px 18px 4px;
+        align-self: flex-start;
+        max-width: 80%;
+      }
+      .chat-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.3);
+      }
+      .chat-container {
+        height: calc(100vh - 240px);
+        overflow-y: auto;
+      }
+      .typing-indicator {
+        display: inline-flex;
+        align-items: center;
+      }
+      .typing-indicator span {
+        height: 8px;
+        width: 8px;
+        margin: 0 1px;
+        background-color: #9CA3AF;
+        border-radius: 50%;
+        display: inline-block;
+        animation: typing-bounce 1.4s infinite ease-in-out both;
+      }
+      .typing-indicator span:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+      .typing-indicator span:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+      @keyframes typing-bounce {
+        0%, 80%, 100% {
+          transform: scale(0);
+        }
+        40% {
+          transform: scale(1);
+        }
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- 顶部导航栏 -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center">
+          <a href="#" class="flex-shrink-0 flex items-center">
+            <i class="fa fa-graduation-cap text-primary text-2xl mr-2"></i>
+            <span class="font-bold text-lg text-primary">智能答疑</span>
+          </a>
+          
+          <!-- 导航链接 - 中等屏幕以上显示 -->
+          <div class="hidden md:ml-10 md:flex md:space-x-8">
+            <a href="student_dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-home mr-2"></i>
+              首页
+            </a>
+            <a href="courses.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-book mr-2"></i>
+              课程
+            </a>
+            <a href="assignments.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-file-text mr-2"></i>
+              作业
+            </a>
+            <a href="grades.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-graduation-cap mr-2"></i>
+              成绩
+            </a>
+            <a href="chatbot.html" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-comments-o mr-2"></i>
+              智能答疑
+            </a>
+          </div>
+        </div>
+        
+        <!-- 右侧用户信息和操作 -->
+        <div class="flex items-center">
+          <!-- 通知图标 -->
+          <div class="ml-3 relative">
+            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-bell text-xl"></i>
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
+            </button>
+          </div>
+          
+          <!-- 用户头像 -->
+          <div class="ml-3 relative">
+            <div class="flex items-center">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/1012/200/200" alt="用户头像">
+              <span class="ml-2 text-sm font-medium text-gray-700">王小明</span>
+              <i class="fa fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- 页面标题和说明 -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">智能答疑机器人</h1>
+      <p class="text-gray-600 mt-1">24小时在线为您解答学习中遇到的问题</p>
+    </div>
+    
+    <!-- 聊天界面 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <!-- 聊天头部 -->
+      <div class="p-4 border-b border-gray-200 bg-gray-50">
+        <div class="flex items-center">
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-xl">
+            <i class="fa fa-robot"></i>
+          </div>
+          <div class="ml-3">
+            <h2 class="font-semibold text-gray-900">学习助手</h2>
+            <p class="text-xs text-green-500">在线 <i class="fa fa-circle ml-1"></i></p>
+          </div>
+          <div class="ml-auto flex space-x-2">
+            <button class="text-gray-500 hover:text-gray-700">
+              <i class="fa fa-phone"></i>
+            </button>
+            <button class="text-gray-500 hover:text-gray-700">
+              <i class="fa fa-video-camera"></i>
+            </button>
+            <button class="text-gray-500 hover:text-gray-700">
+              <i class="fa fa-info-circle"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 聊天内容 -->
+      <div id="chat-container" class="p-6 chat-container space-y-4">
+        <!-- 欢迎消息 -->
+        <div class="flex flex-col space-y-2">
+          <div class="message-bubble-bot p-3">
+            <p>您好！我是您的智能学习助手。请问有什么学习问题可以帮助您解决？</p>
+          </div>
+          <div class="text-xs text-gray-400 ml-4">10:30</div>
+        </div>
+        
+        <!-- 预设问题 -->
+        <div class="flex flex-wrap gap-2 mt-2">
+          <button class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full">如何计算函数极限？</button>
+          <button class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full">什么是导数？</button>
+          <button class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full">求不定积分的方法</button>
+          <button class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full">如何准备期末考试？</button>
+        </div>
+        
+        <!-- 用户消息 -->
+        <div class="flex flex-col items-end space-y-2">
+          <div class="message-bubble-user p-3">
+            <p>你能给我解释一下什么是函数极限吗？我上课没太听懂。</p>
+          </div>
+          <div class="text-xs text-gray-400 mr-4">10:31</div>
+        </div>
+        
+        <!-- 机器人回复 -->
+        <div class="flex flex-col space-y-2">
+          <div class="message-bubble-bot p-3">
+            <p class="mb-2"><strong>函数极限的概念：</strong></p>
+            <p class="mb-2">函数极限是微积分中的一个基本概念，表示当自变量趋近于某个值时，函数值趋近于的某个确定数值。</p>
+            <p class="mb-2">简单来说，当x越来越接近某个值a时，f(x)也越来越接近某个常数L，我们就说当x趋近于a时，f(x)的极限是L，记作：</p>
+            <div class="bg-gray-100 p-2 rounded my-2 text-center font-mono">lim(x→a) f(x) = L</div>
+            <p>需要注意的是，极限关注的是函数在某点附近的变化趋势，而不是函数在该点的具体取值。</p>
+          </div>
+          <div class="text-xs text-gray-400 ml-4">10:32</div>
+        </div>
+        
+        <!-- 机器人附加信息 -->
+        <div class="flex flex-col space-y-2">
+          <div class="message-bubble-bot p-3">
+            <p class="mb-2"><strong>相关学习资源推荐：</strong></p>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li><a href="#" class="text-primary hover:underline">函数极限视频讲解</a></li>
+              <li><a href="#" class="text-primary hover:underline">函数极限习题解析</a></li>
+              <li><a href="#" class="text-primary hover:underline">极限计算方法汇总</a></li>
+            </ul>
+          </div>
+          <div class="text-xs text-gray-400 ml-4">10:32</div>
+        </div>
+        
+        <!-- 用户消息 -->
+        <div class="flex flex-col items-end space-y-2">
+          <div class="message-bubble-user p-3">
+            <p>那如何计算两个函数相除的极限呢？</p>
+          </div>
+          <div class="text-xs text-gray-400 mr-4">10:33</div>
+        </div>
+        
+        <!-- 机器人正在输入 -->
+        <div class="flex flex-col space-y-2">
+          <div class="message-bubble-bot p-3">
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 聊天输入框 -->
+      <div class="p-4 border-t border-gray-200">
+        <div class="flex items-center space-x-2">
+          <button class="text-gray-500 hover:text-gray-700 p-2">
+            <i class="fa fa-paperclip"></i>
+          </button>
+          <button class="text-gray-500 hover:text-gray-700 p-2">
+            <i class="fa fa-image"></i>
+          </button>
+          <button class="text-gray-500 hover:text-gray-700 p-2">
+            <i class="fa fa-microphone"></i>
+          </button>
+          <input type="text" id="chat-input" class="flex-1 border border-gray-300 rounded-full px-4 py-2 chat-input" placeholder="输入您的问题...">
+          <button id="send-message" class="bg-primary hover:bg-primary/90 text-white p-2 rounded-full">
+            <i class="fa fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 常见问题 -->
+    <div class="mt-8">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">常见问题</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <h3 class="font-medium text-gray-900 mb-1">如何提高学习效率？</h3>
+          <p class="text-sm text-gray-600">了解我们的学习路径推荐系统如何帮助您规划学习时间...</p>
+          <button class="text-primary text-sm hover:underline mt-2">查看详情</button>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <h3 class="font-medium text-gray-900 mb-1">系统如何预测学习风险？</h3>
+          <p class="text-sm text-gray-600">了解我们的机器学习模型如何分析您的学习数据...</p>
+          <button class="text-primary text-sm hover:underline mt-2">查看详情</button>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <h3 class="font-medium text-gray-900 mb-1">如何上传作业？</h3>
+          <p class="text-sm text-gray-600">详细步骤说明如何提交您的电子版作业...</p>
+          <button class="text-primary text-sm hover:underline mt-2">查看详情</button>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <h3 class="font-medium text-gray-900 mb-1">忘记密码怎么办？</h3>
+          <p class="text-sm text-gray-600">找回密码的详细流程和安全验证步骤...</p>
+          <button class="text-primary text-sm hover:underline mt-2">查看详情</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-500">
+        © 2025 个性化学习路径的在线课程管理系统 | 版权所有
+      </p>
+    </div>
+  </footer>
+
+  <!-- 引入必要的JavaScript -->
+  <script src="../assets/js/backend.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查用户登录状态
+      checkLoginStatus();
+      
+      // 获取DOM元素
+      const chatContainer = document.getElementById('chat-container');
+      const chatInput = document.getElementById('chat-input');
+      const sendMessage = document.getElementById('send-message');
+      const loadingIndicator = document.getElementById('global-loading');
+      
+      // 加载聊天历史记录
+      loadChatHistory();
+      
+      // 发送消息功能
+      function sendUserMessage() {
+        const message = chatInput.value.trim();
+        if (message === '') return;
+        
+        // 添加用户消息到聊天窗口
+        const now = new Date();
+        const timeString = formatTime(now);
+        const timestamp = now.toISOString();
+        
+        const userMessageHTML = `
+          <div class="flex flex-col items-end space-y-2 message-item" data-timestamp="${timestamp}">
+            <div class="message-bubble-user p-3">
+              <p>${escapeHtml(message)}</p>
+            </div>
+            <div class="text-xs text-gray-400 mr-4">${timeString}</div>
+          </div>
+        `;
+        
+        // 移除正在输入提示
+        const typingIndicator = document.querySelector('.typing-indicator').parentElement.parentElement.parentElement;
+        if (typingIndicator) {
+          typingIndicator.remove();
+        }
+        
+        // 添加用户消息
+        chatContainer.insertAdjacentHTML('beforeend', userMessageHTML);
+        
+        // 清空输入框
+        chatInput.value = '';
+        
+        // 滚动到底部
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // 显示机器人正在输入
+        const typingHTML = `
+          <div class="flex flex-col space-y-2">
+            <div class="message-bubble-bot p-3">
+              <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        `;
+        chatContainer.insertAdjacentHTML('beforeend', typingHTML);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        // 记录用户消息到本地存储
+        saveMessageToHistory('user', message, timestamp);
+        
+        // 调用后端API获取机器人回复
+        getBotResponse(message, timestamp);
+      }
+      
+      // 调用后端API获取机器人回复
+      function getBotResponse(message, timestamp) {
+        // 显示全局加载指示器
+        showLoading();
+        
+        // 模拟API请求延迟
+        setTimeout(() => {
+          // 实际项目中，这里应该是一个真实的API调用
+          // 这里使用模拟数据进行演示
+          const now = new Date();
+          const timeString = formatTime(now);
+          const botTimestamp = now.toISOString();
+          
+          // 根据消息内容生成不同的回复
+          let botResponse = '';
+          let relatedResources = [];
+          
+          if (message.includes('函数极限')) {
+            botResponse = `函数极限是微积分中的一个基本概念，表示当自变量趋近于某个值时，函数值趋近于的某个确定数值。\n\n简单来说，当x越来越接近某个值a时，f(x)也越来越接近某个常数L，我们就说当x趋近于a时，f(x)的极限是L，记作：\n\nlim(x→a) f(x) = L\n\n需要注意的是，极限关注的是函数在某点附近的变化趋势，而不是函数在该点的具体取值。`;
+            relatedResources = [
+              {title: '函数极限视频讲解', url: '#'},
+              {title: '函数极限习题解析', url: '#'},
+              {title: '极限计算方法汇总', url: '#'}
+            ];
+          } else if (message.includes('积分') || message.includes('不定积分')) {
+            botResponse = `不定积分的计算方法主要包括：\n1. 基本积分公式法\n2. 换元积分法（第一类换元法和第二类换元法）\n3. 分部积分法\n4. 有理函数积分法\n5. 三角函数有理式积分法\n\n在计算不定积分时，通常需要灵活运用这些方法，并且要记住基本的积分公式。`;
+            relatedResources = [
+              {title: '不定积分计算技巧', url: '#'},
+              {title: '积分公式表', url: '#'},
+              {title: '积分练习题集', url: '#'}
+            ];
+          } else if (message.includes('期末') || message.includes('考试')) {
+            botResponse = `准备期末考试的建议：\n1. 制定合理的复习计划，提前开始复习\n2. 重点复习课堂笔记和老师强调的内容\n3. 做历年真题和模拟题，熟悉考试题型\n4. 整理错题本，查漏补缺\n5. 注意合理安排作息，保持良好的身体状态\n6. 参加学习小组，互相交流学习心得`;
+            relatedResources = [
+              {title: '考试复习方法指导', url: '#'},
+              {title: '时间管理技巧', url: '#'},
+              {title: '学习小组申请', url: '#'}
+            ];
+          } else {
+            botResponse = `感谢您的问题！我是您的智能学习助手，我可以帮助您解答学习中遇到的问题，包括数学、物理、化学等学科知识，以及提供学习方法、时间管理等方面的建议。`;
+          }
+          
+          // 隐藏全局加载指示器
+          hideLoading();
+          
+          // 移除正在输入提示
+          const typingIndicator = document.querySelector('.typing-indicator').parentElement.parentElement.parentElement;
+          if (typingIndicator) {
+            typingIndicator.remove();
+          }
+          
+          // 机器人回复
+          const botResponseHTML = `
+            <div class="flex flex-col space-y-2 message-item" data-timestamp="${botTimestamp}">
+              <div class="message-bubble-bot p-3">
+                <p>${formatBotMessage(botResponse)}</p>
+              </div>
+              <div class="text-xs text-gray-400 ml-4">${timeString}</div>
+            </div>
+          `;
+          
+          chatContainer.insertAdjacentHTML('beforeend', botResponseHTML);
+          
+          // 添加相关学习资源
+          if (relatedResources.length > 0) {
+            let resourcesHTML = `
+              <div class="flex flex-col space-y-2 message-item" data-timestamp="${botTimestamp}">
+                <div class="message-bubble-bot p-3">
+                  <p class="mb-2"><strong>相关学习资源推荐：</strong></p>
+                  <ul class="list-disc list-inside space-y-1 text-sm">
+            `;
+            
+            relatedResources.forEach(resource => {
+              resourcesHTML += `<li><a href="${resource.url}" class="text-primary hover:underline">${escapeHtml(resource.title)}</a></li>`;
+            });
+            
+            resourcesHTML += `
+                  </ul>
+                </div>
+                <div class="text-xs text-gray-400 ml-4">${timeString}</div>
+              </div>
+            `;
+            
+            chatContainer.insertAdjacentHTML('beforeend', resourcesHTML);
+          }
+          
+          // 记录机器人回复到本地存储
+          saveMessageToHistory('bot', botResponse, botTimestamp, relatedResources);
+          
+          // 滚动到底部
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 2000);
+      }
+      
+      // 加载聊天历史记录
+      function loadChatHistory() {
+        try {
+          const history = localStorage.getItem('chatHistory');
+          if (history) {
+            const messages = JSON.parse(history);
+            
+            // 清空当前聊天窗口
+            // 保留欢迎消息和预设问题
+            const welcomeSection = chatContainer.querySelector('.mb-6');
+            const presetQuestionsSection = chatContainer.querySelector('.flex.flex-wrap.gap-2');
+            chatContainer.innerHTML = '';
+            chatContainer.appendChild(welcomeSection);
+            chatContainer.appendChild(presetQuestionsSection);
+            
+            // 添加历史消息
+            messages.forEach(msg => {
+              const timeString = formatTime(new Date(msg.timestamp));
+              
+              if (msg.type === 'user') {
+                const userMessageHTML = `
+                  <div class="flex flex-col items-end space-y-2 message-item" data-timestamp="${msg.timestamp}">
+                    <div class="message-bubble-user p-3">
+                      <p>${escapeHtml(msg.content)}</p>
+                    </div>
+                    <div class="text-xs text-gray-400 mr-4">${timeString}</div>
+                  </div>
+                `;
+                chatContainer.insertAdjacentHTML('beforeend', userMessageHTML);
+              } else if (msg.type === 'bot') {
+                const botResponseHTML = `
+                  <div class="flex flex-col space-y-2 message-item" data-timestamp="${msg.timestamp}">
+                    <div class="message-bubble-bot p-3">
+                      <p>${formatBotMessage(msg.content)}</p>
+                    </div>
+                    <div class="text-xs text-gray-400 ml-4">${timeString}</div>
+                  </div>
+                `;
+                chatContainer.insertAdjacentHTML('beforeend', botResponseHTML);
+                
+                // 添加相关学习资源
+                if (msg.resources && msg.resources.length > 0) {
+                  let resourcesHTML = `
+                    <div class="flex flex-col space-y-2 message-item" data-timestamp="${msg.timestamp}">
+                      <div class="message-bubble-bot p-3">
+                        <p class="mb-2"><strong>相关学习资源推荐：</strong></p>
+                        <ul class="list-disc list-inside space-y-1 text-sm">
+                  `;
+                  
+                  msg.resources.forEach(resource => {
+                    resourcesHTML += `<li><a href="${resource.url}" class="text-primary hover:underline">${escapeHtml(resource.title)}</a></li>`;
+                  });
+                  
+                  resourcesHTML += `
+                        </ul>
+                      </div>
+                      <div class="text-xs text-gray-400 ml-4">${timeString}</div>
+                    </div>
+                  `;
+                  
+                  chatContainer.insertAdjacentHTML('beforeend', resourcesHTML);
+                }
+              }
+            });
+          }
+        } catch (error) {
+          console.error('加载聊天历史失败:', error);
+        }
+        
+        // 滚动到底部
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+      
+      // 保存消息到历史记录
+      function saveMessageToHistory(type, content, timestamp, resources = []) {
+        try {
+          const history = localStorage.getItem('chatHistory');
+          const messages = history ? JSON.parse(history) : [];
+          
+          messages.push({
+            type,
+            content,
+            timestamp,
+            resources
+          });
+          
+          // 限制历史记录长度，最多保存50条消息
+          if (messages.length > 50) {
+            messages.splice(0, messages.length - 50);
+          }
+          
+          localStorage.setItem('chatHistory', JSON.stringify(messages));
+        } catch (error) {
+          console.error('保存聊天历史失败:', error);
+        }
+      }
+      
+      // 辅助函数：格式化时间
+      function formatTime(date) {
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+      }
+      
+      // 辅助函数：格式化机器人消息（处理换行）
+      function formatBotMessage(message) {
+        // 将\n替换为<br>
+        return escapeHtml(message).replace(/\n/g, '<br>');
+      }
+      
+      // 辅助函数：HTML转义
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+      
+      // 辅助函数：显示加载指示器
+      function showLoading() {
+        if (loadingIndicator) {
+          loadingIndicator.classList.remove('hidden');
+        }
+      }
+      
+      // 辅助函数：隐藏加载指示器
+      function hideLoading() {
+        if (loadingIndicator) {
+          loadingIndicator.classList.add('hidden');
+        }
+      }
+      
+      // 点击发送按钮发送消息
+      sendMessage.addEventListener('click', sendUserMessage);
+      
+      // 按下Enter键发送消息
+      chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendUserMessage();
+        }
+      });
+      
+      // 预设问题按钮点击事件
+      const presetButtons = document.querySelectorAll('.flex.flex-wrap.gap-2 button');
+      presetButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          chatInput.value = this.textContent;
+          chatInput.focus();
+        });
+      });
+      
+      // 常见问题点击事件
+      const faqButtons = document.querySelectorAll('.mt-8 button');
+      faqButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const question = this.parentElement.querySelector('h3').textContent;
+          chatInput.value = question;
+          sendUserMessage();
+        });
+      });
+      
+      // 初始化滚动到底部
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+  </script>
+</body>
+</html>

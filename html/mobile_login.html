@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>登录 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .input-focus {
+        @apply focus:outline-none focus:ring-2 focus:ring-primary/50;
+      }
+      .btn-primary {
+        @apply bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50;
+      }
+      .btn-secondary {
+        @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg border border-gray-300 transition-all shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-primary/30;
+      }
+      .form-input {
+        @apply w-full px-4 py-3 rounded-lg border border-gray-300 input-focus text-gray-700;
+      }
+      .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-1;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <!-- 状态栏 - 模拟华为Mate 70Pro状态栏 -->
+  <div class="bg-white px-4 py-2 flex items-center justify-between border-b border-gray-200">
+    <div class="text-sm font-medium text-gray-900">10:30</div>
+    <div class="flex items-center space-x-1">
+      <i class="fa fa-signal text-gray-700"></i>
+      <i class="fa fa-wifi text-gray-700"></i>
+      <i class="fa fa-battery-three-quarters text-gray-700"></i>
+    </div>
+  </div>
+
+  <!-- 主内容区 -->
+  <main class="flex-1 flex flex-col px-6 py-8">
+    <!-- 登录Logo和标题 -->
+    <div class="flex flex-col items-center mb-10">
+      <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+        <i class="fa fa-graduation-cap text-3xl text-primary"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900">个性化学习系统</h1>
+      <p class="text-sm text-gray-500 mt-1">请登录您的账号</p>
+    </div>
+    
+    <!-- 登录表单 -->
+    <form class="space-y-4">
+      <!-- 用户名 -->
+      <div>
+        <label for="username" class="form-label">用户名</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+            <i class="fa fa-user"></i>
+          </span>
+          <input type="text" id="username" class="form-input pl-10" placeholder="请输入用户名">
+        </div>
+      </div>
+      
+      <!-- 密码 -->
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label for="password" class="form-label">密码</label>
+          <a href="#" class="text-xs text-primary hover:text-primary/80">忘记密码？</a>
+        </div>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+            <i class="fa fa-lock"></i>
+          </span>
+          <input type="password" id="password" class="form-input pl-10" placeholder="请输入密码">
+          <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+            <i class="fa fa-eye"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 用户角色选择 -->
+      <div>
+        <label class="form-label">用户角色</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" class="role-btn py-2 px-3 rounded-lg border border-primary bg-primary/10 text-primary font-medium text-sm focus:outline-none">
+            学生
+          </button>
+          <button type="button" class="role-btn py-2 px-3 rounded-lg border border-gray-300 text-gray-700 font-medium text-sm focus:outline-none">
+            教师
+          </button>
+          <button type="button" class="role-btn py-2 px-3 rounded-lg border border-gray-300 text-gray-700 font-medium text-sm focus:outline-none">
+            管理员
+          </button>
+        </div>
+      </div>
+      
+      <!-- 记住我 -->
+      <div class="flex items-center">
+        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+        <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+          记住我
+        </label>
+      </div>
+      
+      <!-- 登录按钮 -->
+      <button type="button" id="login-button" class="btn-primary w-full">
+        登录
+      </button>
+      
+      <!-- 其他登录方式 -->
+      <div class="flex items-center justify-center my-6">
+        <div class="h-px bg-gray-300 flex-1"></div>
+        <span class="px-4 text-sm text-gray-500">其他登录方式</span>
+        <div class="h-px bg-gray-300 flex-1"></div>
+      </div>
+      
+      <!-- 第三方登录 -->
+      <div class="flex justify-center space-x-8">
+        <button type="button" class="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-blue-600 hover:bg-blue-50 transition-colors">
+          <i class="fa fa-weixin text-xl"></i>
+        </button>
+        <button type="button" class="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-blue-800 hover:bg-blue-50 transition-colors">
+          <i class="fa fa-qq text-xl"></i>
+        </button>
+        <button type="button" class="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-red-600 hover:bg-red-50 transition-colors">
+          <i class="fa fa-weibo text-xl"></i>
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <!-- 底部版权信息 -->
+  <footer class="px-6 py-4 text-center text-xs text-gray-500">
+    <p>© 2025 个性化学习路径的在线课程管理系统</p>
+    <p class="mt-1">版本 1.0.0</p>
+  </footer>
+
+  <!-- 引入JavaScript -->
+  <script src="../assets/js/backend.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查用户是否已登录
+      if (backend.isLoggedIn()) {
+        const user = backend.getCurrentUser();
+        window.location.href = 'mobile_dashboard.html';
+        return;
+      }
+      
+      // 获取DOM元素
+      const togglePassword = document.getElementById('toggle-password');
+      const password = document.getElementById('password');
+      const loginButton = document.getElementById('login-button');
+      const roleButtons = document.querySelectorAll('.role-btn');
+      let selectedRole = 'student'; // 默认角色为学生
+      
+      // 切换密码显示/隐藏
+      togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+      });
+      
+      // 角色选择
+      roleButtons.forEach((button, index) => {
+        button.addEventListener('click', function() {
+          // 移除所有角色按钮的选中状态
+          roleButtons.forEach(btn => {
+            btn.classList.remove('border-primary', 'bg-primary/10', 'text-primary');
+            btn.classList.add('border-gray-300', 'text-gray-700');
+          });
+          
+          // 添加当前按钮的选中状态
+          this.classList.remove('border-gray-300', 'text-gray-700');
+          this.classList.add('border-primary', 'bg-primary/10', 'text-primary');
+          
+          // 更新选中的角色
+          const roles = ['student', 'teacher', 'admin'];
+          selectedRole = roles[index];
+        });
+      });
+      
+      // 登录按钮点击事件
+      loginButton.addEventListener('click', async function() {
+        const username = document.getElementById('username').value.trim();
+        const passwordVal = password.value.trim();
+        const rememberMe = document.getElementById('remember-me').checked;
+        
+        if (username === '' || passwordVal === '') {
+          showNotification('请输入用户名和密码', 'error');
+          return;
+        }
+        
+        // 禁用登录按钮，显示加载状态
+        loginButton.disabled = true;
+        loginButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 登录中...';
+        
+        try {
+          // 调用后端服务进行登录
+          const result = await backend.login(username, passwordVal);
+          
+          if (result.success) {
+            const user = result.data.user;
+            
+            // 检查角色是否匹配
+            if (user.role !== selectedRole) {
+              showNotification(`当前账号不是${selectedRole === 'student' ? '学生' : selectedRole === 'teacher' ? '教师' : '管理员'}账号`, 'error');
+              loginButton.disabled = false;
+              loginButton.innerHTML = '登录';
+              return;
+            }
+            
+            // 登录成功，跳转到首页
+            showNotification('登录成功，正在跳转...', 'success');
+            
+            setTimeout(() => {
+              window.location.href = 'mobile_dashboard.html';
+            }, 1000);
+          } else {
+            showNotification(result.error, 'error');
+          }
+        } catch (error) {
+          showNotification('登录失败，请稍后重试', 'error');
+        } finally {
+          // 恢复登录按钮状态
+          loginButton.disabled = false;
+          loginButton.innerHTML = '登录';
+        }
+      });
+      
+      // 显示通知函数
+      function showNotification(message, type = 'info') {
+        // 检查是否已存在通知元素
+        let notification = document.getElementById('mobile-login-notification');
+        
+        if (!notification) {
+          // 创建通知元素
+          notification = document.createElement('div');
+          notification.id = 'mobile-login-notification';
+          notification.className = 'fixed top-16 left-1/2 transform -translate-x-1/2 px-5 py-3 rounded-lg shadow-lg transition-all duration-300 z-50';
+          document.body.appendChild(notification);
+        }
+        
+        // 设置通知样式和内容
+        notification.textContent = message;
+        
+        if (type === 'success') {
+          notification.classList.add('bg-green-500', 'text-white');
+          notification.classList.remove('bg-red-500', 'bg-blue-500');
+        } else if (type === 'error') {
+          notification.classList.add('bg-red-500', 'text-white');
+          notification.classList.remove('bg-green-500', 'bg-blue-500');
+        } else {
+          notification.classList.add('bg-blue-500', 'text-white');
+          notification.classList.remove('bg-green-500', 'bg-red-500');
+        }
+        
+        // 显示通知
+        notification.classList.remove('opacity-0', 'translate-y-[-20px]');
+        notification.classList.add('opacity-100', 'translate-y-0');
+        
+        // 3秒后隐藏通知
+        setTimeout(() => {
+          notification.classList.add('opacity-0', 'translate-y-[-20px]');
+          notification.classList.remove('opacity-100', 'translate-y-0');
+        }, 3000);
+      }
+      
+      // 更新状态栏时间
+      function updateStatusBarTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const statusBarTime = document.querySelector('.bg-white.px-4.py-2.flex.items-center.justify-between.border-b.border-gray-200 .text-sm.font-medium.text-gray-900');
+        if (statusBarTime) {
+          statusBarTime.textContent = `${hours}:${minutes}`;
+        }
+      }
+      
+      // 初始化状态栏时间
+      updateStatusBarTime();
+      
+      // 每分钟更新一次状态栏时间
+      setInterval(updateStatusBarTime, 60000);
+    });
+  </script>
+</body>
+</html>

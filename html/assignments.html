@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作业中心 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .assignment-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .assignment-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- 顶部导航栏 -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center">
+          <a href="#" class="flex-shrink-0 flex items-center">
+            <i class="fa fa-graduation-cap text-primary text-2xl mr-2"></i>
+            <span class="font-bold text-lg text-primary">学习路径系统</span>
+          </a>
+          
+          <!-- 导航链接 - 中等屏幕以上显示 -->
+          <div class="hidden md:ml-10 md:flex md:space-x-8">
+            <a href="student_dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-home mr-2"></i>
+              首页
+            </a>
+            <a href="courses.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-book mr-2"></i>
+              我的课程
+            </a>
+            <a href="assignments.html" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-file-text mr-2"></i>
+              作业中心
+            </a>
+            <a href="grades.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-graduation-cap mr-2"></i>
+              成绩查询
+            </a>
+          </div>
+        </div>
+        
+        <!-- 右侧用户信息和操作 -->
+        <div class="flex items-center">
+          <!-- 搜索框 -->
+          <div class="hidden md:block">
+            <div class="ml-3 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fa fa-search text-gray-400"></i>
+              </div>
+              <input class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary" placeholder="搜索作业...">
+            </div>
+          </div>
+          
+          <!-- 通知图标 -->
+          <div class="ml-3 relative">
+            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-bell text-xl"></i>
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
+            </button>
+          </div>
+          
+          <!-- 智能助手 -->
+          <div class="ml-3 relative">
+            <button class="chat-bot-button text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-robot text-xl text-primary"></i>
+            </button>
+          </div>
+          
+          <!-- 用户头像 -->
+          <div class="ml-3 relative">
+            <div class="flex items-center">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/64/200/200" alt="用户头像">
+              <span class="ml-2 text-sm font-medium text-gray-700">张同学</span>
+              <i class="fa fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- 页面标题和筛选 -->
+    <div class="mb-8">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">作业中心</h1>
+          <p class="text-gray-600 mt-1">管理和提交你的课程作业</p>
+        </div>
+        
+        <div class="mt-4 md:mt-0 flex space-x-4">
+          <!-- 筛选标签 -->
+          <div class="flex flex-wrap gap-2">
+            <button class="px-3 py-1 text-sm font-medium rounded-full bg-primary text-white">
+              全部作业
+            </button>
+            <button class="px-3 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">
+              待提交
+            </button>
+            <button class="px-3 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">
+              已提交
+            </button>
+            <button class="px-3 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300">
+              已批改
+            </button>
+          </div>
+          
+          <!-- 搜索按钮（移动端） -->
+          <div class="md:hidden">
+            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 待提交作业 -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900">待提交作业</h2>
+        <span class="text-sm font-medium text-red-600">
+          <i class="fa fa-exclamation-circle mr-1"></i>
+          3项作业即将截止
+        </span>
+      </div>
+      
+      <!-- 作业列表 -->
+      <div class="space-y-4">
+        <!-- 作业1 -->
+        <div class="assignment-card bg-white shadow rounded-lg overflow-hidden">
+          <div class="flex flex-col md:flex-row">
+            <div class="md:w-1/4 bg-blue-50 p-4 flex items-center justify-center border-r border-gray-100">
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-600 mb-2">
+                  <i class="fa fa-file-text-o text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">高等数学</h3>
+                <p class="text-sm text-gray-500">微积分练习题</p>
+              </div>
+            </div>
+            
+            <div class="md:w-1/2 p-4">
+              <h4 class="text-md font-semibold text-gray-900 mb-2">极限与连续综合练习</h4>
+              <p class="text-sm text-gray-600 mb-3">完成教材第45页到56页的练习题，包括极限计算、连续性证明等内容。</p>
+              <div class="flex items-center text-xs text-gray-500">
+                <div class="flex items-center mr-4">
+                  <i class="fa fa-clock-o mr-1"></i>
+                  <span>需时：约120分钟</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fa fa-question-circle mr-1 text-primary"></i>
+                  <span class="text-primary">有3个答疑请求</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="md:w-1/4 p-4 flex flex-col justify-between">
+              <div class="text-right">
+                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mb-2">
+                  <i class="fa fa-calendar-check-o mr-1"></i>
+                  明天截止
+                </div>
+                <p class="text-sm text-gray-500">截止日期：2023-10-16 23:59</p>
+              </div>
+              
+              <div class="flex justify-end space-x-2 mt-4">
+                <button class="view-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <i class="fa fa-eye mr-1"></i>
+                  查看详情
+                </button>
+                <button class="submit-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <i class="fa fa-upload mr-1"></i>
+                  提交作业
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 作业2 -->
+        <div class="assignment-card bg-white shadow rounded-lg overflow-hidden">
+          <div class="flex flex-col md:flex-row">
+            <div class="md:w-1/4 bg-green-50 p-4 flex items-center justify-center border-r border-gray-100">
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-2">
+                  <i class="fa fa-file-text-o text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">线性代数</h3>
+                <p class="text-sm text-gray-500">矩阵与行列式</p>
+              </div>
+            </div>
+            
+            <div class="md:w-1/2 p-4">
+              <h4 class="text-md font-semibold text-gray-900 mb-2">矩阵运算与行列式计算</h4>
+              <p class="text-sm text-gray-600 mb-3">完成教材第28页到35页的练习题，重点掌握矩阵乘法、逆矩阵计算和行列式展开方法。</p>
+              <div class="flex items-center text-xs text-gray-500">
+                <div class="flex items-center mr-4">
+                  <i class="fa fa-clock-o mr-1"></i>
+                  <span>需时：约90分钟</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fa fa-question-circle mr-1 text-primary"></i>
+                  <span class="text-primary">有5个答疑请求</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="md:w-1/4 p-4 flex flex-col justify-between">
+              <div class="text-right">
+                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 mb-2">
+                  <i class="fa fa-calendar-check-o mr-1"></i>
+                  后天截止
+                </div>
+                <p class="text-sm text-gray-500">截止日期：2023-10-17 23:59</p>
+              </div>
+              
+              <div class="flex justify-end space-x-2 mt-4">
+                <button class="view-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <i class="fa fa-eye mr-1"></i>
+                  查看详情
+                </button>
+                <button class="submit-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <i class="fa fa-upload mr-1"></i>
+                  提交作业
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 作业3 -->
+        <div class="assignment-card bg-white shadow rounded-lg overflow-hidden">
+          <div class="flex flex-col md:flex-row">
+            <div class="md:w-1/4 bg-purple-50 p-4 flex items-center justify-center border-r border-gray-100">
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600 mb-2">
+                  <i class="fa fa-file-text-o text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">概率论</h3>
+                <p class="text-sm text-gray-500">基础概率计算</p>
+              </div>
+            </div>
+            
+            <div class="md:w-1/2 p-4">
+              <h4 class="text-md font-semibold text-gray-900 mb-2">古典概率与条件概率</h4>
+              <p class="text-sm text-gray-600 mb-3">完成教材第15页到22页的练习题，包括排列组合、古典概型、条件概率和全概率公式的应用。</p>
+              <div class="flex items-center text-xs text-gray-500">
+                <div class="flex items-center mr-4">
+                  <i class="fa fa-clock-o mr-1"></i>
+                  <span>需时：约75分钟</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fa fa-question-circle mr-1 text-primary"></i>
+                  <span class="text-primary">有2个答疑请求</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="md:w-1/4 p-4 flex flex-col justify-between">
+              <div class="text-right">
+                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 mb-2">
+                  <i class="fa fa-calendar-check-o mr-1"></i>
+                  后天截止
+                </div>
+                <p class="text-sm text-gray-500">截止日期：2023-10-17 23:59</p>
+              </div>
+              
+              <div class="flex justify-end space-x-2 mt-4">
+                <button class="view-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <i class="fa fa-eye mr-1"></i>
+                  查看详情
+                </button>
+                <button class="submit-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <i class="fa fa-upload mr-1"></i>
+                  提交作业
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 已提交作业 -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900">已提交作业</h2>
+        <button class="text-sm font-medium text-primary hover:text-primary/80">
+          查看全部
+          <i class="fa fa-chevron-right text-xs ml-1"></i>
+        </button>
+      </div>
+      
+      <!-- 作业列表 -->
+      <div class="space-y-4">
+        <!-- 作业1 -->
+        <div class="assignment-card bg-white shadow rounded-lg overflow-hidden">
+          <div class="flex flex-col md:flex-row">
+            <div class="md:w-1/4 bg-blue-50 p-4 flex items-center justify-center border-r border-gray-100">
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 mb-2">
+                  <i class="fa fa-file-text-o text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">计算机基础</h3>
+                <p class="text-sm text-gray-500">操作系统作业</p>
+              </div>
+            </div>
+            
+            <div class="md:w-1/2 p-4">
+              <h4 class="text-md font-semibold text-gray-900 mb-2">进程管理与调度算法</h4>
+              <p class="text-sm text-gray-600 mb-3">分析并实现不同的进程调度算法，比较它们的性能差异和适用场景。</p>
+              <div class="flex items-center text-xs text-gray-500">
+                <div class="flex items-center mr-4">
+                  <i class="fa fa-clock-o mr-1"></i>
+                  <span>提交于：2023-10-12 15:30</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fa fa-paperclip mr-1"></i>
+                  <span>1个附件</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="md:w-1/4 p-4 flex flex-col justify-between">
+              <div class="text-right">
+                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mb-2">
+                  <i class="fa fa-check-circle mr-1"></i>
+                  已提交
+                </div>
+                <p class="text-sm text-gray-500">等待教师批改</p>
+              </div>
+              
+              <div class="flex justify-end space-x-2 mt-4">
+                <button class="view-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <i class="fa fa-eye mr-1"></i>
+                  查看详情
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 作业2 -->
+        <div class="assignment-card bg-white shadow rounded-lg overflow-hidden">
+          <div class="flex flex-col md:flex-row">
+            <div class="md:w-1/4 bg-green-50 p-4 flex items-center justify-center border-r border-gray-100">
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-2">
+                  <i class="fa fa-file-text-o text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">大学物理</h3>
+                <p class="text-sm text-gray-500">力学实验报告</p>
+              </div>
+            </div>
+            
+            <div class="md:w-1/2 p-4">
+              <h4 class="text-md font-semibold text-gray-900 mb-2">牛顿第二定律验证实验</h4>
+              <p class="text-sm text-gray-600 mb-3">根据实验数据，分析加速度与力的关系，验证牛顿第二定律的正确性。</p>
+              <div class="flex items-center text-xs text-gray-500">
+                <div class="flex items-center mr-4">
+                  <i class="fa fa-clock-o mr-1"></i>
+                  <span>提交于：2023-10-10 09:45</span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fa fa-paperclip mr-1"></i>
+                  <span>2个附件</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="md:w-1/4 p-4 flex flex-col justify-between">
+              <div class="text-right">
+                <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-2">
+                  <i class="fa fa-check-circle mr-1"></i>
+                  已批改
+                </div>
+                <p class="text-sm font-semibold text-yellow-600">成绩：85</p>
+              </div>
+              
+              <div class="flex justify-end space-x-2 mt-4">
+                <button class="view-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                  <i class="fa fa-eye mr-1"></i>
+                  查看详情
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 学习风险提醒 -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md shadow-sm mb-8">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="fa fa-exclamation-triangle text-yellow-500 text-xl"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-yellow-800">学习风险提醒</h3>
+          <div class="mt-2 text-sm text-yellow-700">
+            <p>根据你的作业提交情况和测验成绩，系统检测到你在高等数学课程上存在35%的挂科风险。建议：</p>
+            <ul class="list-disc pl-5 mt-1 space-y-1">
+              <li>优先完成即将截止的微积分练习作业</li>
+              <li>观看推荐的补学视频：《极限计算难点解析》</li>
+              <li>预约助教在线辅导</li>
+            </ul>
+          </div>
+          <div class="mt-3">
+            <button class="risk-prediction-btn inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+              查看详细分析报告
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-500">
+        © 2025 个性化学习路径的在线课程管理系统 | 版权所有
+      </p>
+    </div>
+  </footer>
+
+  <!-- 模态框：作业详情 -->
+  <div id="assignment-detail-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h4 class="modal-title">作业详情</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- 内容将通过JavaScript动态加载 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-close px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          关闭
+        </button>
+        <button class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          <i class="fa fa-upload mr-1"></i>
+          提交作业
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：学习风险预测 -->
+  <div id="risk-prediction-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h4 class="modal-title">学习风险预测分析报告</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- 内容将通过JavaScript动态加载 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-close px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          关闭
+        </button>
+        <button class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          获取学习建议
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：智能答疑机器人 -->
+  <div id="chat-bot-modal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <div class="modal-header">
+        <h4 class="modal-title">智能学习助手</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <div class="chat-container h-[400px] overflow-y-auto p-4 space-y-3">
+          <!-- 聊天内容将通过JavaScript动态加载 -->
+        </div>
+        <div class="border-t p-3 flex">
+          <input type="text" class="chat-input flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="请问有什么可以帮助你的？">
+          <button class="chat-send px-4 py-2 bg-primary text-white rounded-r-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fa fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入JavaScript -->
+  <script src="backend.js"></script>
+  <script src="../assets/js/script.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查用户是否已登录
+      if (!backend.isLoggedIn() || backend.getCurrentUser().role !== 'student') {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const user = backend.getCurrentUser();
+      
+      // 更新用户头像和名称
+      const userAvatar = document.querySelector('img.h-8.w-8.rounded-full.object-cover');
+      const userName = document.querySelector('img.h-8.w-8.rounded-full.object-cover + span');
+      if (userAvatar && userName) {
+        userName.textContent = user.name || '学生用户';
+      }
+      
+      // 加载作业数据
+      loadAssignments();
+      
+      // 加载学习风险提醒
+      loadLearningRiskAlert();
+      
+      // 添加筛选标签点击事件
+      const filterButtons = document.querySelectorAll('.flex.flex-wrap.gap-2 button');
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // 移除所有按钮的选中状态
+          filterButtons.forEach(btn => {
+            btn.className = 'px-3 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300';
+          });
+          
+          // 设置当前按钮为选中状态
+          this.className = 'px-3 py-1 text-sm font-medium rounded-full bg-primary text-white';
+          
+          // 获取筛选条件
+          let status = 'all';
+          if (this.textContent.trim() === '待提交') status = 'pending';
+          if (this.textContent.trim() === '已提交') status = 'submitted';
+          if (this.textContent.trim() === '已批改') status = 'graded';
+          
+          // 根据筛选条件显示作业
+          filterAssignments(status);
+        });
+      });
+      
+      // 添加搜索功能
+      const searchInput = document.querySelector('input[placeholder="搜索作业..."]');
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          searchAssignments(this.value);
+        });
+      }
+      
+      // 查看全部已提交作业
+      const viewAllButton = document.querySelector('.text-sm.font-medium.text-primary');
+      if (viewAllButton) {
+        viewAllButton.addEventListener('click', function() {
+          loadSubmittedAssignments(true);
+        });
+      }
+      
+      // 登出功能
+      const userProfile = document.querySelector('.ml-3.relative .flex.items-center');
+      if (userProfile) {
+        userProfile.addEventListener('click', function() {
+          if (confirm('确定要退出登录吗？')) {
+            backend.logout();
+            window.location.href = 'login.html';
+          }
+        });
+      }
+      
+      // 智能助手按钮
+      const chatBotButton = document.querySelector('.chat-bot-button');
+      if (chatBotButton) {
+        chatBotButton.addEventListener('click', function() {
+          openChatBot();
+        });
+      }
+      
+      // 学习风险提醒按钮
+      const riskPredictionButton = document.querySelector('.risk-prediction-btn');
+      if (riskPredictionButton) {
+        riskPredictionButton.addEventListener('click', function() {
+          openRiskPredictionModal();
+        });
+      }
+      
+      // 初始化模态框关闭功能
+      const closeButtons = document.querySelectorAll('.modal-close');
+      closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          closeAllModals();
+        });
+      });
+      
+      // 点击模态框外部关闭
+      window.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal')) {
+          closeAllModals();
+        }
+      });
+    });
+    
+    // 加载作业数据
+    async function loadAssignments() {
+      try {
+        // 显示加载状态
+        showLoadingState(true);
+        
+        // 加载待提交作业
+        const pendingResult = await backend.getPendingAssignments();
+        
+        if (pendingResult.success) {
+          updatePendingAssignments(pendingResult.data);
+        } else {
+          console.error('Failed to load pending assignments');
+        }
+        
+        // 加载已提交作业
+        await loadSubmittedAssignments(false);
+      } catch (error) {
+        console.error('Error loading assignments:', error);
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 加载已提交作业
+    async function loadSubmittedAssignments(showAll) {
+      try {
+        const submittedResult = await backend.getSubmittedAssignments(showAll);
+        
+        if (submittedResult.success) {
+          updateSubmittedAssignments(submittedResult.data, showAll);
+        } else {
+          console.error('Failed to load submitted assignments');
+        }
+      } catch (error) {
+        console.error('Error loading submitted assignments:', error);
+      }
+    }
+    
+    // 更新待提交作业
+    function updatePendingAssignments(assignments) {
+      const container = document.querySelector('.mb-8:nth-of-type(2) .space-y-4');
+      if (container) {
+        // 清空现有内容
+        container.innerHTML = '';
+        
+        if (assignments.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-8 bg-white rounded-lg shadow">
+              <i class="fa fa-check-circle text-green-500 text-4xl mb-3"></i>
+              <p class="text-gray-600">没有待提交的作业</p>
+            </div>
+          `;
+          return;
+        }
+        
+        assignments.forEach(assignment => {
+          const assignmentCard = document.createElement('div');
+          assignmentCard.className = 'assignment-card bg-white shadow rounded-lg overflow-hidden';
+          assignmentCard.dataset.assignmentId = assignment.id;
+          assignmentCard.dataset.course = assignment.courseName.toLowerCase();
+          assignmentCard.dataset.title = assignment.title.toLowerCase();
+          
+          // 计算截止时间状态
+          const dueDate = new Date(assignment.dueDate);
+          const today = new Date();
+          const tomorrow = new Date();
+          tomorrow.setDate(today.getDate() + 1);
+          
+          let deadlineStatus = '';
+          let deadlineClass = '';
+          
+          if (dueDate.toDateString() === tomorrow.toDateString()) {
+            deadlineStatus = '明天截止';
+            deadlineClass = 'bg-red-100 text-red-800';
+          } else if (dueDate.toDateString() === new Date(today.setDate(today.getDate() + 2)).toDateString()) {
+            deadlineStatus = '后天截止';
+            deadlineClass = 'bg-orange-100 text-orange-800';
+          } else {
+            deadlineStatus = '即将截止';
+            deadlineClass = 'bg-yellow-100 text-yellow-800';
+          }
+          
+          // 生成随机颜色
+          const colors = ['blue', 'green', 'purple', 'indigo', 'pink'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          
+          assignmentCard.innerHTML = `
+            <div class="flex flex-col md:flex-row">
+              <div class="md:w-1/4 bg-${randomColor}-50 p-4 flex items-center justify-center border-r border-gray-100">
+                <div class="text-center">
+                  <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-${randomColor}-100 text-${randomColor}-600 mb-2">
+                    <i class="fa fa-file-text-o text-xl"></i>
+                  </div>
+                  <h3 class="text-lg font-bold text-gray-900">${assignment.courseName}</h3>
+                  <p class="text-sm text-gray-500">${assignment.category}</p>
+                </div>
+              </div>
+              
+              <div class="md:w-1/2 p-4">
+                <h4 class="text-md font-semibold text-gray-900 mb-2">${assignment.title}</h4>
+                <p class="text-sm text-gray-600 mb-3">${assignment.description}</p>
+                <div class="flex items-center text-xs text-gray-500">
+                  <div class="flex items-center mr-4">
+                    <i class="fa fa-clock-o mr-1"></i>
+                    <span>需时：约${assignment.estimatedTime}分钟</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fa fa-question-circle mr-1 text-primary"></i>
+                    <span class="text-primary">有${assignment.doubtCount}个答疑请求</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="md:w-1/4 p-4 flex flex-col justify-between">
+                <div class="text-right">
+                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${deadlineClass} mb-2">
+                    <i class="fa fa-calendar-check-o mr-1"></i>
+                    ${deadlineStatus}
+                  </div>
+                  <p class="text-sm text-gray-500">截止日期：${formatDate(assignment.dueDate)}</p>
+                </div>
+                
+                <div class="flex justify-end space-x-2 mt-4">
+                  <button class="view-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <i class="fa fa-eye mr-1"></i>
+                    查看详情
+                  </button>
+                  <button class="submit-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <i class="fa fa-upload mr-1"></i>
+                    提交作业
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          container.appendChild(assignmentCard);
+          
+          // 添加按钮事件
+          const viewBtn = assignmentCard.querySelector('.view-assignment-btn');
+          const submitBtn = assignmentCard.querySelector('.submit-assignment-btn');
+          
+          if (viewBtn) {
+            viewBtn.addEventListener('click', function() {
+              openAssignmentDetail(assignment.id);
+            });
+          }
+          
+          if (submitBtn) {
+            submitBtn.addEventListener('click', function() {
+              openAssignmentDetail(assignment.id, true);
+            });
+          }
+        });
+      }
+    }
+    
+    // 更新已提交作业
+    function updateSubmittedAssignments(assignments, showAll) {
+      const container = document.querySelector('.mb-8:nth-of-type(3) .space-y-4');
+      const viewAllButton = document.querySelector('.text-sm.font-medium.text-primary');
+      
+      if (container) {
+        // 清空现有内容
+        container.innerHTML = '';
+        
+        if (assignments.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-8 bg-white rounded-lg shadow">
+              <i class="fa fa-file-o text-gray-400 text-4xl mb-3"></i>
+              <p class="text-gray-600">暂无已提交的作业</p>
+            </div>
+          `;
+          if (viewAllButton) viewAllButton.style.display = 'none';
+          return;
+        }
+        
+        // 如果不是显示全部，只显示前两个
+        const displayAssignments = showAll ? assignments : assignments.slice(0, 2);
+        
+        displayAssignments.forEach(assignment => {
+          const assignmentCard = document.createElement('div');
+          assignmentCard.className = 'assignment-card bg-white shadow rounded-lg overflow-hidden';
+          assignmentCard.dataset.assignmentId = assignment.id;
+          assignmentCard.dataset.course = assignment.courseName.toLowerCase();
+          assignmentCard.dataset.title = assignment.title.toLowerCase();
+          
+          // 生成随机颜色
+          const colors = ['blue', 'green', 'purple', 'indigo', 'pink'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          
+          // 状态样式
+          let statusClass = '';
+          let statusText = '';
+          let gradeText = '';
+          
+          if (assignment.status === 'graded') {
+            statusClass = 'bg-green-100 text-green-800';
+            statusText = '已批改';
+            gradeText = `<p class="text-sm font-semibold text-yellow-600">成绩：${assignment.grade}</p>`;
+          } else {
+            statusClass = 'bg-blue-100 text-blue-800';
+            statusText = '已提交';
+            gradeText = '<p class="text-sm text-gray-500">等待教师批改</p>';
+          }
+          
+          assignmentCard.innerHTML = `
+            <div class="flex flex-col md:flex-row">
+              <div class="md:w-1/4 bg-${randomColor}-50 p-4 flex items-center justify-center border-r border-gray-100">
+                <div class="text-center">
+                  <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-${randomColor}-100 text-${randomColor}-600 mb-2">
+                    <i class="fa fa-file-text-o text-xl"></i>
+                  </div>
+                  <h3 class="text-lg font-bold text-gray-900">${assignment.courseName}</h3>
+                  <p class="text-sm text-gray-500">${assignment.category}</p>
+                </div>
+              </div>
+              
+              <div class="md:w-1/2 p-4">
+                <h4 class="text-md font-semibold text-gray-900 mb-2">${assignment.title}</h4>
+                <p class="text-sm text-gray-600 mb-3">${assignment.description}</p>
+                <div class="flex items-center text-xs text-gray-500">
+                  <div class="flex items-center mr-4">
+                    <i class="fa fa-clock-o mr-1"></i>
+                    <span>提交于：${formatDate(assignment.submitTime)}</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fa fa-paperclip mr-1"></i>
+                    <span>${assignment.attachmentCount}个附件</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="md:w-1/4 p-4 flex flex-col justify-between">
+                <div class="text-right">
+                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass} mb-2">
+                    <i class="fa fa-check-circle mr-1"></i>
+                    ${statusText}
+                  </div>
+                  ${gradeText}
+                </div>
+                
+                <div class="flex justify-end space-x-2 mt-4">
+                  <button class="view-assignment-btn px-3 py-1 text-sm font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <i class="fa fa-eye mr-1"></i>
+                    查看详情
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          container.appendChild(assignmentCard);
+          
+          // 添加按钮事件
+          const viewBtn = assignmentCard.querySelector('.view-assignment-btn');
+          if (viewBtn) {
+            viewBtn.addEventListener('click', function() {
+              openAssignmentDetail(assignment.id);
+            });
+          }
+        });
+        
+        // 控制查看全部按钮显示
+        if (viewAllButton) {
+          if (showAll || assignments.length <= 2) {
+            viewAllButton.style.display = 'none';
+          } else {
+            viewAllButton.style.display = 'block';
+          }
+        }
+      }
+    }
+    
+    // 加载学习风险提醒
+    async function loadLearningRiskAlert() {
+      try {
+        const riskResult = await backend.getLearningRiskAlert();
+        
+        if (riskResult.success && riskResult.data.hasRisk) {
+          const riskAlert = document.querySelector('.bg-yellow-50.border-l-4.border-yellow-400');
+          if (riskAlert) {
+            const riskPercentage = riskResult.data.riskPercentage;
+            let riskText = '';
+            
+            if (riskPercentage >= 70) {
+              riskText = '高风险';
+              riskAlert.className = 'bg-red-50 border-l-4 border-red-400 p-4 rounded-md shadow-sm mb-8';
+            } else if (riskPercentage >= 30) {
+              riskText = '中等风险';
+            } else {
+              riskText = '低风险';
+            }
+            
+            riskAlert.querySelector('p:first-of-type').textContent = `根据你的作业提交情况和测验成绩，系统检测到你在${riskResult.data.courseName}课程上存在${riskPercentage}%的挂科风险。建议：`;
+            
+            // 更新建议列表
+            const recommendations = riskResult.data.recommendations;
+            const recommendationsList = riskAlert.querySelector('ul');
+            
+            if (recommendationsList && recommendations && recommendations.length > 0) {
+              recommendationsList.innerHTML = '';
+              recommendations.forEach(recommendation => {
+                const li = document.createElement('li');
+                li.className = 'list-disc pl-5 mt-1';
+                li.textContent = recommendation;
+                recommendationsList.appendChild(li);
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading learning risk alert:', error);
+      }
+    }
+    
+    // 根据状态筛选作业
+    function filterAssignments(status) {
+      const allAssignmentCards = document.querySelectorAll('.assignment-card');
+      const pendingContainer = document.querySelector('.mb-8:nth-of-type(2)');
+      const submittedContainer = document.querySelector('.mb-8:nth-of-type(3)');
+      
+      if (status === 'all') {
+        // 显示所有作业
+        if (pendingContainer) pendingContainer.style.display = 'block';
+        if (submittedContainer) submittedContainer.style.display = 'block';
+        return;
+      }
+      
+      if (status === 'pending') {
+        // 只显示待提交作业
+        if (pendingContainer) pendingContainer.style.display = 'block';
+        if (submittedContainer) submittedContainer.style.display = 'none';
+      } else {
+        // 只显示已提交/已批改作业
+        if (pendingContainer) pendingContainer.style.display = 'none';
+        if (submittedContainer) submittedContainer.style.display = 'block';
+        
+        // 筛选已提交作业中的状态
+        const submittedCards = submittedContainer.querySelectorAll('.assignment-card');
+        submittedCards.forEach(card => {
+          const cardStatus = card.querySelector('.inline-flex.items-center.px-2.5.py-0.5.rounded-full.text-xs.font-medium').textContent.trim();
+          
+          if (status === 'submitted' && cardStatus === '已提交') {
+            card.style.display = 'block';
+          } else if (status === 'graded' && cardStatus === '已批改') {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+    }
+    
+    // 搜索作业
+    function searchAssignments(keyword) {
+      if (!keyword.trim()) {
+        // 如果搜索框为空，显示所有内容
+        filterAssignments('all');
+        return;
+      }
+      
+      keyword = keyword.toLowerCase();
+      const allAssignmentCards = document.querySelectorAll('.assignment-card');
+      let hasVisibleCards = false;
+      
+      allAssignmentCards.forEach(card => {
+        const course = card.dataset.course || '';
+        const title = card.dataset.title || '';
+        
+        if (course.includes(keyword) || title.includes(keyword)) {
+          card.style.display = 'block';
+          hasVisibleCards = true;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // 处理没有搜索结果的情况
+      const pendingContainer = document.querySelector('.mb-8:nth-of-type(2)');
+      const submittedContainer = document.querySelector('.mb-8:nth-of-type(3)');
+      const noResultsContainer = document.querySelector('.no-search-results');
+      
+      if (!hasVisibleCards) {
+        if (!noResultsContainer) {
+          const noResults = document.createElement('div');
+          noResults.className = 'no-search-results bg-white rounded-lg shadow p-8 text-center';
+          noResults.innerHTML = `
+            <i class="fa fa-search text-gray-400 text-4xl mb-3"></i>
+            <p class="text-gray-600">没有找到相关作业</p>
+          `;
+          
+          const mainContent = document.querySelector('main');
+          const firstSection = mainContent.querySelector('.mb-8');
+          mainContent.insertBefore(noResults, firstSection);
+        } else {
+          noResultsContainer.style.display = 'block';
+        }
+        
+        if (pendingContainer) pendingContainer.style.display = 'none';
+        if (submittedContainer) submittedContainer.style.display = 'none';
+      } else if (noResultsContainer) {
+        noResultsContainer.style.display = 'none';
+        if (pendingContainer) pendingContainer.style.display = 'block';
+        if (submittedContainer) submittedContainer.style.display = 'block';
+      }
+    }
+    
+    // 打开作业详情模态框
+    async function openAssignmentDetail(assignmentId, showSubmitForm = false) {
+      try {
+        // 显示加载状态
+        showLoadingState(true);
+        
+        const result = await backend.getAssignmentById(assignmentId);
+        
+        if (result.success) {
+          const assignment = result.data;
+          const modal = document.getElementById('assignment-detail-modal');
+          const modalBody = modal.querySelector('.modal-body');
+          const modalFooter = modal.querySelector('.modal-footer');
+          
+          if (modalBody) {
+            // 清空现有内容
+            modalBody.innerHTML = '';
+            
+            // 生成作业详情HTML
+            let attachmentsHtml = '';
+            if (assignment.attachments && assignment.attachments.length > 0) {
+              attachmentsHtml = `
+                <div class="mt-4">
+                  <h5 class="text-sm font-medium text-gray-700 mb-2">附件</h5>
+                  <div class="space-y-2">
+                    ${assignment.attachments.map(attachment => `
+                      <a href="#" class="flex items-center p-2 bg-gray-50 rounded hover:bg-gray-100">
+                        <i class="fa fa-file-o mr-2 text-gray-500"></i>
+                        <span class="text-sm text-gray-700">${attachment.name}</span>
+                        <span class="ml-auto text-xs text-gray-500">${formatFileSize(attachment.size)}</span>
+                      </a>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }
+            
+            let submitHistoryHtml = '';
+            if (assignment.submitHistory && assignment.submitHistory.length > 0) {
+              const lastSubmit = assignment.submitHistory[assignment.submitHistory.length - 1];
+              submitHistoryHtml = `
+                <div class="mt-4 p-3 bg-gray-50 rounded-md">
+                  <h5 class="text-sm font-medium text-gray-700 mb-2">提交记录</h5>
+                  <div class="text-sm text-gray-600">
+                    <p>提交时间：${formatDateTime(lastSubmit.submitTime)}</p>
+                    ${lastSubmit.grade ? `<p>成绩：<span class="font-medium text-yellow-600">${lastSubmit.grade}</span></p>` : ''}
+                    ${lastSubmit.feedback ? `<p>教师评语：${lastSubmit.feedback}</p>` : ''}
+                  </div>
+                </div>
+              `;
+            }
+            
+            modalBody.innerHTML = `
+              <div class="mb-4">
+                <h3 class="text-lg font-bold text-gray-900">${assignment.title}</h3>
+                <p class="text-sm text-gray-500 mt-1">${assignment.courseName} - ${assignment.category}</p>
+              </div>
+              
+              <div class="mb-4">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">作业描述</h4>
+                <p class="text-sm text-gray-600">${assignment.description}</p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">截止日期</h4>
+                  <p class="text-sm text-gray-600">${formatDateTime(assignment.dueDate)}</p>
+                </div>
+                <div>
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">预计用时</h4>
+                  <p class="text-sm text-gray-600">约${assignment.estimatedTime}分钟</p>
+                </div>
+              </div>
+              
+              ${attachmentsHtml}
+              
+              ${submitHistoryHtml}
+            `;
+          }
+          
+          if (modalFooter) {
+            // 如果显示提交表单
+            if (showSubmitForm) {
+              // 移除原有按钮
+              while (modalFooter.firstChild) {
+                modalFooter.removeChild(modalFooter.firstChild);
+              }
+              
+              // 添加上传表单
+              const formContainer = document.createElement('div');
+              formContainer.className = 'w-full';
+              formContainer.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between w-full">
+                  <div class="flex items-center justify-center w-full mb-3 md:mb-0 md:w-2/3">
+                    <label for="file-upload" class="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                      <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <i class="fa fa-cloud-upload text-2xl text-gray-400 mb-2"></i>
+                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">点击上传</span> 或拖放文件</p>
+                        <p class="text-xs text-gray-500">支持 PDF, Word, Excel, PowerPoint 文件</p>
+                      </div>
+                      <input id="file-upload" type="file" class="hidden" multiple />
+                    </label>
+                  </div>
+                  <div class="md:w-1/3 flex justify-end space-x-2">
+                    <button class="modal-close px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                      取消
+                    </button>
+                    <button id="confirm-submit-btn" class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                      <i class="fa fa-upload mr-1"></i>
+                      确认提交
+                    </button>
+                  </div>
+                </div>
+              `;
+              
+              modalFooter.appendChild(formContainer);
+              
+              // 添加确认提交事件
+              const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+              if (confirmSubmitBtn) {
+                confirmSubmitBtn.addEventListener('click', function() {
+                  submitAssignment(assignmentId);
+                });
+              }
+            } else {
+              // 检查是否已提交
+              const isSubmitted = assignment.submitHistory && assignment.submitHistory.length > 0;
+              
+              // 更新底部按钮
+              const submitBtn = modalFooter.querySelector('button:last-child');
+              if (submitBtn && !isSubmitted) {
+                submitBtn.style.display = 'inline-flex';
+                submitBtn.addEventListener('click', function() {
+                  openAssignmentDetail(assignmentId, true);
+                });
+              } else if (submitBtn) {
+                submitBtn.style.display = 'none';
+              }
+            }
+          }
+          
+          // 显示模态框
+          modal.style.display = 'flex';
+        } else {
+          alert('无法加载作业详情，请稍后重试');
+        }
+      } catch (error) {
+        console.error('Error loading assignment detail:', error);
+        alert('无法加载作业详情，请稍后重试');
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 提交作业
+    async function submitAssignment(assignmentId) {
+      try {
+        const fileInput = document.getElementById('file-upload');
+        if (!fileInput || fileInput.files.length === 0) {
+          alert('请选择要上传的文件');
+          return;
+        }
+        
+        // 显示加载状态
+        showLoadingState(true);
+        
+        const result = await backend.submitAssignment(assignmentId, fileInput.files);
+        
+        if (result.success) {
+          alert('作业提交成功！');
+          closeAllModals();
+          // 重新加载作业数据
+          loadAssignments();
+        } else {
+          alert('作业提交失败：' + (result.message || '未知错误'));
+        }
+      } catch (error) {
+        console.error('Error submitting assignment:', error);
+        alert('作业提交失败，请稍后重试');
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 打开学习风险预测模态框
+    async function openRiskPredictionModal() {
+      try {
+        // 显示加载状态
+        showLoadingState(true);
+        
+        const result = await backend.getLearningRiskAlert();
+        
+        if (result.success && result.data.hasRisk) {
+          const riskData = result.data;
+          const modal = document.getElementById('risk-prediction-modal');
+          const modalBody = modal.querySelector('.modal-body');
+          
+          if (modalBody) {
+            // 清空现有内容
+            modalBody.innerHTML = '';
+            
+            // 生成风险分析HTML
+            modalBody.innerHTML = `
+              <div class="mb-4">
+                <h3 class="text-lg font-bold text-gray-900">${riskData.courseName} - 学习风险分析</h3>
+                <p class="text-sm text-gray-500 mt-1">基于你的学习数据和表现的综合评估</p>
+              </div>
+              
+              <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h4 class="text-sm font-medium text-gray-700">挂科风险指数</h4>
+                  <span class="text-sm font-semibold ${riskData.riskPercentage >= 70 ? 'text-red-600' : riskData.riskPercentage >= 30 ? 'text-yellow-600' : 'text-green-600'}">${riskData.riskPercentage}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="${riskData.riskPercentage >= 70 ? 'bg-red-500' : riskData.riskPercentage >= 30 ? 'bg-yellow-500' : 'bg-green-500'} h-2.5 rounded-full" style="width: ${riskData.riskPercentage}%"></div>
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">风险原因</h4>
+                <p class="text-sm text-gray-600">${riskData.reason}</p>
+              </div>
+              
+              <div class="mb-4">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">历史表现趋势</h4>
+                <div class="h-40 bg-gray-50 rounded-lg p-2"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-700 mb-2">个性化学习建议</h4>
+                <ul class="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                  ${riskData.recommendations.map(recommendation => `
+                    <li>${recommendation}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            `;
+          }
+          
+          // 显示模态框
+          modal.style.display = 'flex';
+        } else {
+          alert('目前没有检测到学习风险');
+        }
+      } catch (error) {
+        console.error('Error loading risk prediction:', error);
+        alert('无法加载学习风险分析，请稍后重试');
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 打开智能助手聊天
+    function openChatBot() {
+      const modal = document.getElementById('chat-bot-modal');
+      const chatContainer = modal.querySelector('.chat-container');
+      const chatInput = modal.querySelector('.chat-input');
+      const chatSend = modal.querySelector('.chat-send');
+      
+      if (chatContainer) {
+        // 清空聊天内容
+        chatContainer.innerHTML = '';
+        
+        // 添加欢迎消息
+        const welcomeMessage = document.createElement('div');
+        welcomeMessage.className = 'flex items-start space-x-2';
+        welcomeMessage.innerHTML = `
+          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+            <i class="fa fa-robot"></i>
+          </div>
+          <div class="bg-gray-100 rounded-lg rounded-tl-none px-4 py-2 max-w-[80%]">
+            <p class="text-sm text-gray-700">你好！我是你的智能学习助手。请问有什么可以帮助你的？</p>
+          </div>
+        `;
+        
+        chatContainer.appendChild(welcomeMessage);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+      
+      if (chatSend) {
+        chatSend.addEventListener('click', function() {
+          sendChatMessage(chatInput, chatContainer);
+        });
+      }
+      
+      if (chatInput) {
+        chatInput.addEventListener('keypress', function(event) {
+          if (event.key === 'Enter') {
+            sendChatMessage(chatInput, chatContainer);
+          }
+        });
+      }
+      
+      // 显示模态框
+      modal.style.display = 'flex';
+    }
+    
+    // 发送聊天消息
+    async function sendChatMessage(chatInput, chatContainer) {
+      const message = chatInput.value.trim();
+      if (!message) return;
+      
+      // 添加用户消息
+      const userMessage = document.createElement('div');
+      userMessage.className = 'flex items-start space-x-2 justify-end';
+      userMessage.innerHTML = `
+        <div class="bg-primary text-white rounded-lg rounded-tr-none px-4 py-2 max-w-[80%]">
+          <p class="text-sm">${message}</p>
+        </div>
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700">
+          <i class="fa fa-user"></i>
+        </div>
+      `;
+      
+      chatContainer.appendChild(userMessage);
+      chatInput.value = '';
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      
+      try {
+        // 获取助手回复
+        const user = backend.getCurrentUser();
+        const result = await backend.askQuestion(message, user.id);
+        
+        if (result.success) {
+          // 添加助手回复
+          const botMessage = document.createElement('div');
+          botMessage.className = 'flex items-start space-x-2';
+          botMessage.innerHTML = `
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+              <i class="fa fa-robot"></i>
+            </div>
+            <div class="bg-gray-100 rounded-lg rounded-tl-none px-4 py-2 max-w-[80%]">
+              <p class="text-sm text-gray-700">${result.data.answer}</p>
+            </div>
+          `;
+          
+          chatContainer.appendChild(botMessage);
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        } else {
+          // 显示错误消息
+          const errorMessage = document.createElement('div');
+          errorMessage.className = 'flex items-start space-x-2';
+          errorMessage.innerHTML = `
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+              <i class="fa fa-robot"></i>
+            </div>
+            <div class="bg-gray-100 rounded-lg rounded-tl-none px-4 py-2 max-w-[80%]">
+              <p class="text-sm text-gray-700">抱歉，我暂时无法回答这个问题。请稍后再试。</p>
+            </div>
+          `;
+          
+          chatContainer.appendChild(errorMessage);
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+      } catch (error) {
+        console.error('Error getting chatbot response:', error);
+        
+        // 显示错误消息
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'flex items-start space-x-2';
+        errorMessage.innerHTML = `
+          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+            <i class="fa fa-robot"></i>
+          </div>
+          <div class="bg-gray-100 rounded-lg rounded-tl-none px-4 py-2 max-w-[80%]">
+            <p class="text-sm text-gray-700">抱歉，我暂时无法回答这个问题。请稍后再试。</p>
+          </div>
+        `;
+        
+        chatContainer.appendChild(errorMessage);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+    
+    // 关闭所有模态框
+    function closeAllModals() {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        modal.style.display = 'none';
+      });
+    }
+    
+    // 显示加载状态
+    function showLoadingState(show) {
+      const mainContent = document.querySelector('main');
+      let loadingElement = document.getElementById('loading-overlay');
+      
+      if (show) {
+        if (!loadingElement) {
+          loadingElement = document.createElement('div');
+          loadingElement.id = 'loading-overlay';
+          loadingElement.className = 'fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center';
+          loadingElement.innerHTML = `
+            <div class="text-center">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              <p class="mt-4 text-gray-600">加载中...</p>
+            </div>
+          `;
+          document.body.appendChild(loadingElement);
+        } else {
+          loadingElement.style.display = 'flex';
+        }
+        
+        if (mainContent) {
+          mainContent.style.opacity = '0.5';
+        }
+      } else {
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+        }
+        
+        if (mainContent) {
+          mainContent.style.opacity = '1';
+        }
+      }
+    }
+    
+    // 格式化日期
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+    
+    // 格式化日期时间
+    function formatDateTime(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+    
+    // 格式化文件大小
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.personalizedlearning.system.mapper.CourseMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.personalizedlearning.system.entity.Course">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="LONGVARCHAR"/>
+        <result column="teacher_id" property="teacherId" jdbcType="BIGINT"/>
+        <result column="cover_image" property="coverImage" jdbcType="VARCHAR"/>
+        <result column="start_date" property="startDate" jdbcType="DATE"/>
+        <result column="end_date" property="endDate" jdbcType="DATE"/>
+        <result column="total_chapters" property="totalChapters" jdbcType="INTEGER"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <!-- 插入课程 -->
+    <insert id="insert" parameterType="com.personalizedlearning.system.entity.Course">
+        INSERT INTO courses (name, description, teacher_id, cover_image, start_date, end_date, total_chapters, status)
+        VALUES (#{name}, #{description}, #{teacherId}, #{coverImage}, #{startDate}, #{endDate}, #{totalChapters}, #{status})
+    </insert>
+
+    <!-- 更新课程 -->
+    <update id="update" parameterType="com.personalizedlearning.system.entity.Course">
+        UPDATE courses
+        SET name = #{name},
+            description = #{description},
+            teacher_id = #{teacherId},
+            cover_image = #{coverImage},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            total_chapters = #{totalChapters},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除课程 -->
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM courses WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID查询课程 -->
+    <select id="findById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM courses WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有课程 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM courses
+    </select>
+
+    <!-- 根据教师ID查询课程 -->
+    <select id="findByTeacherId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT * FROM courses WHERE teacher_id = #{teacherId}
+    </select>
+
+    <!-- 根据学生ID查询课程 -->
+    <select id="findByStudentId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT c.* FROM courses c
+        JOIN student_courses sc ON c.id = sc.course_id
+        WHERE sc.student_id = #{studentId}
+    </select>
+
+    <!-- 学生加入课程 -->
+    <insert id="addStudentToCourse" parameterType="map">
+        INSERT INTO student_courses (student_id, course_id)
+        VALUES (#{studentId}, #{courseId})
+    </insert>
+
+    <!-- 学生退出课程 -->
+    <delete id="removeStudentFromCourse" parameterType="map">
+        DELETE FROM student_courses
+        WHERE student_id = #{studentId} AND course_id = #{courseId}
+    </delete>
+
+    <!-- 检查学生是否已加入课程 -->
+    <select id="checkStudentCourseRelation" parameterType="map" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM student_courses
+        WHERE student_id = #{studentId} AND course_id = #{courseId}
+    </select>
+
+    <!-- 搜索课程 -->
+    <select id="searchCourses" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM courses
+        WHERE name LIKE CONCAT('%', #{keyword}, '%')
+           OR description LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <!-- 分页查询课程 -->
+    <select id="findByPage" parameterType="map" resultMap="BaseResultMap">
+        SELECT * FROM courses LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 查询课程总数 -->
+    <select id="count" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM courses
+    </select>
+
+    <!-- 根据状态查询课程 -->
+    <select id="findByStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT * FROM courses WHERE status = #{status}
+    </select>
+
+    <!-- 获取课程学生列表 -->
+    <select id="getStudentsByCourseId" parameterType="java.lang.Long" resultType="com.personalizedlearning.system.entity.User">
+        SELECT u.* FROM users u
+        JOIN student_courses sc ON u.id = sc.student_id
+        WHERE sc.course_id = #{courseId}
+    </select>
+</mapper>

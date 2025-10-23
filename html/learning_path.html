@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学习路径推荐 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+      .step-connector {
+        content: '';
+        position: absolute;
+        top: 28px;
+        left: 24px;
+        width: 2px;
+        height: calc(100% - 28px);
+        background-color: #e5e7eb;
+        z-index: 0;
+      }
+      .step-connector-active {
+        background-color: #4361ee;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- 顶部导航栏 -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center">
+          <a href="#" class="flex-shrink-0 flex items-center">
+            <i class="fa fa-graduation-cap text-primary text-2xl mr-2"></i>
+            <span class="font-bold text-lg text-primary">学习路径系统</span>
+          </a>
+          
+          <!-- 导航链接 - 中等屏幕以上显示 -->
+          <div class="hidden md:ml-10 md:flex md:space-x-8">
+            <a href="student_dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-home mr-2"></i>
+              首页
+            </a>
+            <a href="courses.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-book mr-2"></i>
+              课程
+            </a>
+            <a href="assignments.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-file-text mr-2"></i>
+              作业
+            </a>
+            <a href="grades.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-graduation-cap mr-2"></i>
+              成绩
+            </a>
+            <a href="learning_path.html" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-map-signs mr-2"></i>
+              学习路径
+            </a>
+          </div>
+        </div>
+        
+        <!-- 右侧用户信息和操作 -->
+        <div class="flex items-center">
+          <!-- 搜索框 -->
+          <div class="hidden md:block">
+            <div class="ml-3 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fa fa-search text-gray-400"></i>
+              </div>
+              <input class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary" placeholder="搜索课程...">
+            </div>
+          </div>
+          
+          <!-- 通知图标 -->
+          <div class="ml-3 relative">
+            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-bell text-xl"></i>
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
+            </button>
+          </div>
+          
+          <!-- 用户头像 -->
+          <div class="ml-3 relative">
+            <div class="flex items-center">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/1012/200/200" alt="用户头像">
+              <span class="ml-2 text-sm font-medium text-gray-700">王小明</span>
+              <i class="fa fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- 页面标题和说明 -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">个性化学习路径</h1>
+      <p class="text-gray-600 mt-1">基于您的学习数据和表现，系统为您推荐的最佳学习顺序</p>
+    </div>
+    
+    <!-- 学习路径概览 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-gray-900">您的学习路径概览</h2>
+          <div class="text-sm text-primary">
+            <i class="fa fa-refresh mr-1"></i> 最后更新: 今天 09:30
+          </div>
+        </div>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- 总体进度 -->
+          <div class="bg-blue-50 rounded-lg p-4">
+            <h3 class="text-sm font-medium text-gray-700 mb-2">总体进度</h3>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl font-bold text-primary">45%</span>
+              <span class="text-sm text-gray-500">目标: 100%</span>
+            </div>
+            <div class="w-full bg-blue-100 rounded-full h-2.5">
+              <div class="bg-primary h-2.5 rounded-full" style="width: 45%"></div>
+            </div>
+          </div>
+          
+          <!-- 已完成知识点 -->
+          <div class="bg-green-50 rounded-lg p-4">
+            <h3 class="text-sm font-medium text-gray-700 mb-2">已完成知识点</h3>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl font-bold text-green-600">18/40</span>
+              <span class="text-sm text-gray-500">45%</span>
+            </div>
+            <div class="w-full bg-green-100 rounded-full h-2.5">
+              <div class="bg-green-600 h-2.5 rounded-full" style="width: 45%"></div>
+            </div>
+          </div>
+          
+          <!-- 待完成知识点 -->
+          <div class="bg-yellow-50 rounded-lg p-4">
+            <h3 class="text-sm font-medium text-gray-700 mb-2">待完成知识点</h3>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-2xl font-bold text-yellow-600">22/40</span>
+              <span class="text-sm text-gray-500">55%</span>
+            </div>
+            <div class="w-full bg-yellow-100 rounded-full h-2.5">
+              <div class="bg-yellow-600 h-2.5 rounded-full" style="width: 55%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 学习路径详情 -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+      <!-- 左侧学习路径 -->
+      <div class="lg:col-span-3 bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">推荐学习顺序</h2>
+            <button class="text-sm text-primary hover:text-primary/80">
+              <i class="fa fa-question-circle mr-1"></i> 如何优化我的学习路径
+            </button>
+          </div>
+        </div>
+        
+        <!-- 学习步骤 -->
+        <div class="p-6">
+          <!-- 步骤1 -->
+          <div class="mb-8 relative pl-12" style="position: relative;">
+            <div class="absolute left-0 top-0 flex items-center justify-center w-10 h-10 bg-primary rounded-full text-white font-bold">
+              1
+            </div>
+            <div class="step-connector step-connector-active"></div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">函数极限与连续性</h3>
+            <p class="text-gray-600 mb-3">基于您的测验结果，系统发现您在函数极限概念理解上存在不足，建议优先学习此章节。</p>
+            <div class="flex items-center mb-3">
+              <span class="text-xs font-medium text-white bg-red-500 px-2 py-1 rounded">优先学习</span>
+              <span class="text-xs text-gray-500 ml-3">预计学习时间: 2小时</span>
+            </div>
+            <div class="flex space-x-2">
+              <button class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fa fa-play-circle mr-1"></i>
+                开始学习
+              </button>
+              <button class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fa fa-file-text-o mr-1"></i>
+                查看资料
+              </button>
+            </div>
+          </div>
+          
+          <!-- 步骤2 -->
+          <div class="mb-8 relative pl-12" style="position: relative;">
+            <div class="absolute left-0 top-0 flex items-center justify-center w-10 h-10 bg-primary rounded-full text-white font-bold">
+              2
+            </div>
+            <div class="step-connector step-connector-active"></div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">导数与微分</h3>
+            <p class="text-gray-600 mb-3">导数是微积分的核心概念，掌握好此章节对后续学习至关重要。</p>
+            <div class="flex items-center mb-3">
+              <span class="text-xs font-medium text-white bg-orange-500 px-2 py-1 rounded">重要</span>
+              <span class="text-xs text-gray-500 ml-3">预计学习时间: 3小时</span>
+            </div>
+            <div class="flex space-x-2">
+              <button class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fa fa-play-circle mr-1"></i>
+                开始学习
+              </button>
+              <button class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fa fa-file-text-o mr-1"></i>
+                查看资料
+              </button>
+            </div>
+          </div>
+          
+          <!-- 步骤3 -->
+          <div class="mb-8 relative pl-12" style="position: relative;">
+            <div class="absolute left-0 top-0 flex items-center justify-center w-10 h-10 bg-primary rounded-full text-white font-bold">
+              3
+            </div>
+            <div class="step-connector step-connector-active"></div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">微分中值定理与导数应用</h3>
+            <p class="text-gray-600 mb-3">此章节将帮助您理解导数在解决实际问题中的应用，是微积分的重要组成部分。</p>
+            <div class="flex items-center mb-3">
+              <span class="text-xs font-medium text-white bg-blue-500 px-2 py-1 rounded">核心</span>
+              <span class="text-xs text-gray-500 ml-3">预计学习时间: 4小时</span>
+            </div>
+            <div class="flex space-x-2">
+              <button class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fa fa-play-circle mr-1"></i>
+                开始学习
+              </button>
+              <button class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fa fa-file-text-o mr-1"></i>
+                查看资料
+              </button>
+            </div>
+          </div>
+          
+          <!-- 步骤4 -->
+          <div class="mb-8 relative pl-12">
+            <div class="absolute left-0 top-0 flex items-center justify-center w-10 h-10 bg-gray-300 rounded-full text-gray-700 font-bold">
+              4
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">不定积分</h3>
+            <p class="text-gray-600 mb-3">不定积分是微积分的重要组成部分，为后续学习定积分奠定基础。</p>
+            <div class="flex items-center mb-3">
+              <span class="text-xs font-medium text-white bg-gray-500 px-2 py-1 rounded">下一阶段</span>
+              <span class="text-xs text-gray-500 ml-3">预计学习时间: 3.5小时</span>
+            </div>
+            <div class="flex space-x-2">
+              <button class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-400 cursor-not-allowed" disabled>
+                <i class="fa fa-lock mr-1"></i>
+                完成前置内容
+              </button>
+              <button class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fa fa-file-text-o mr-1"></i>
+                查看资料
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 右侧学习数据 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">学习数据分析</h2>
+        </div>
+        
+        <!-- 薄弱知识点 -->
+        <div class="p-6 border-b border-gray-200">
+          <h3 class="text-sm font-medium text-gray-700 mb-3">薄弱知识点</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i class="fa fa-exclamation-circle text-red-500 mr-2"></i>
+                <span class="text-sm text-gray-900">函数极限</span>
+              </div>
+              <span class="text-xs font-medium text-red-500">35%</span>
+            </li>
+            <li class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i class="fa fa-exclamation-circle text-red-500 mr-2"></i>
+                <span class="text-sm text-gray-900">导数的应用</span>
+              </div>
+              <span class="text-xs font-medium text-red-500">42%</span>
+            </li>
+            <li class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i class="fa fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                <span class="text-sm text-gray-900">微积分基本定理</span>
+              </div>
+              <span class="text-xs font-medium text-yellow-500">65%</span>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- 优势知识点 -->
+        <div class="p-6 border-b border-gray-200">
+          <h3 class="text-sm font-medium text-gray-700 mb-3">优势知识点</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                <span class="text-sm text-gray-900">函数概念</span>
+              </div>
+              <span class="text-xs font-medium text-green-500">95%</span>
+            </li>
+            <li class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                <span class="text-sm text-gray-900">导数的定义</span>
+              </div>
+              <span class="text-xs font-medium text-green-500">88%</span>
+            </li>
+            <li class="flex items-center justify-between">
+              <div class="flex items-center">
+                <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                <span class="text-sm text-gray-900">导数的四则运算</span>
+              </div>
+              <span class="text-xs font-medium text-green-500">82%</span>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- 学习建议 -->
+        <div class="p-6">
+          <h3 class="text-sm font-medium text-gray-700 mb-3">学习建议</h3>
+          <div class="space-y-2 text-sm text-gray-600">
+            <p><i class="fa fa-lightbulb-o text-yellow-500 mr-2"></i> 建议每天学习30-60分钟，保持学习连续性</p>
+            <p><i class="fa fa-lightbulb-o text-yellow-500 mr-2"></i> 完成每个章节后，及时进行习题练习巩固</p>
+            <p><i class="fa fa-lightbulb-o text-yellow-500 mr-2"></i> 对于薄弱知识点，可以多次观看视频讲解</p>
+            <p><i class="fa fa-lightbulb-o text-yellow-500 mr-2"></i> 如遇学习困难，可随时使用智能答疑功能</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 推荐学习资源 -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <div class="p-6 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">推荐学习资源</h2>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- 资源1 -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden card-hover">
+            <img src="https://picsum.photos/id/1/400/200" alt="函数极限精讲" class="w-full h-40 object-cover">
+            <div class="p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-white bg-primary px-2 py-1 rounded">视频教程</span>
+                <span class="text-xs text-gray-500">45分钟</span>
+              </div>
+              <h3 class="font-medium text-gray-900 mb-1">函数极限精讲 - 从基础到进阶</h3>
+              <p class="text-sm text-gray-600 mb-3">详细讲解函数极限的概念、性质和计算方法，帮助您深入理解。</p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <img src="https://picsum.photos/id/1005/40/40" alt="讲师头像" class="w-6 h-6 rounded-full mr-2">
+                  <span class="text-xs text-gray-500">李教授</span>
+                </div>
+                <button class="text-primary hover:text-primary/80">
+                  <i class="fa fa-play-circle"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 资源2 -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden card-hover">
+            <img src="https://picsum.photos/id/2/400/200" alt="导数习题集" class="w-full h-40 object-cover">
+            <div class="p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-white bg-green-500 px-2 py-1 rounded">习题集</span>
+                <span class="text-xs text-gray-500">30题</span>
+              </div>
+              <h3 class="font-medium text-gray-900 mb-1">导数与微分习题精选</h3>
+              <p class="text-sm text-gray-600 mb-3">精选导数相关习题，涵盖各种题型，配有详细解答过程。</p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <img src="https://picsum.photos/id/1006/40/40" alt="讲师头像" class="w-6 h-6 rounded-full mr-2">
+                  <span class="text-xs text-gray-500">张老师</span>
+                </div>
+                <button class="text-primary hover:text-primary/80">
+                  <i class="fa fa-download"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 资源3 -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden card-hover">
+            <img src="https://picsum.photos/id/3/400/200" alt="微分中值定理" class="w-full h-40 object-cover">
+            <div class="p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-white bg-purple-500 px-2 py-1 rounded">专题讲座</span>
+                <span class="text-xs text-gray-500">60分钟</span>
+              </div>
+              <h3 class="font-medium text-gray-900 mb-1">微分中值定理及其应用</h3>
+              <p class="text-sm text-gray-600 mb-3">深入讲解微分中值定理的证明和应用，帮助您掌握这一重要知识点。</p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <img src="https://picsum.photos/id/1011/40/40" alt="讲师头像" class="w-6 h-6 rounded-full mr-2">
+                  <span class="text-xs text-gray-500">王教授</span>
+                </div>
+                <button class="text-primary hover:text-primary/80">
+                  <i class="fa fa-play-circle"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-500">
+        © 2025 个性化学习路径的在线课程管理系统 | 版权所有
+      </p>
+    </div>
+  </footer>
+
+  <!-- 引入JavaScript -->
+  <script src="../assets/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的课程 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- 顶部导航栏 -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center">
+          <a href="#" class="flex-shrink-0 flex items-center">
+            <i class="fa fa-graduation-cap text-primary text-2xl mr-2"></i>
+            <span class="font-bold text-lg text-primary">学习路径系统</span>
+          </a>
+          
+          <!-- 导航链接 - 中等屏幕以上显示 -->
+          <div class="hidden md:ml-10 md:flex md:space-x-8">
+            <a href="teacher_dashboard.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-dashboard mr-2"></i>
+              控制面板
+            </a>
+            <a href="teacher_courses.html" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-book mr-2"></i>
+              我的课程
+            </a>
+            <a href="teacher_assignments.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-file-text mr-2"></i>
+              作业管理
+            </a>
+            <a href="teacher_students.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-users mr-2"></i>
+              学生管理
+            </a>
+          </div>
+        </div>
+        
+        <!-- 右侧用户信息和操作 -->
+        <div class="flex items-center">
+          <!-- 搜索框 -->
+          <div class="hidden md:block">
+            <div class="ml-3 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fa fa-search text-gray-400"></i>
+              </div>
+              <input class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary" placeholder="搜索课程...">
+            </div>
+          </div>
+          
+          <!-- 通知图标 -->
+          <div class="ml-3 relative">
+            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-bell text-xl"></i>
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">7</span>
+            </button>
+          </div>
+          
+          <!-- 用户头像 -->
+          <div class="ml-3 relative">
+            <div class="flex items-center">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/1005/200/200" alt="用户头像">
+              <span class="ml-2 text-sm font-medium text-gray-700">李教授</span>
+              <i class="fa fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- 页面标题和操作 -->
+    <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">我的课程</h1>
+        <p class="text-gray-600 mt-1">管理您负责的所有课程</p>
+      </div>
+      <div class="mt-4 md:mt-0 flex space-x-3">
+        <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          <i class="fa fa-plus mr-2"></i>
+          创建新课程
+        </button>
+        <div class="relative">
+          <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fa fa-filter mr-2"></i>
+            筛选
+          </button>
+        </div>
+        <div class="relative">
+          <button class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fa fa-sort mr-2"></i>
+            排序
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 课程筛选工具栏 -->
+    <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label for="course-type" class="block text-sm font-medium text-gray-700 mb-1">课程类型</label>
+          <select id="course-type" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+            <option>全部课程</option>
+            <option>必修课</option>
+            <option>选修课</option>
+            <option>实践课</option>
+          </select>
+        </div>
+        <div>
+          <label for="semester" class="block text-sm font-medium text-gray-700 mb-1">学期</label>
+          <select id="semester" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+            <option>2023-2024学年第一学期</option>
+            <option>2023-2024学年第二学期</option>
+            <option>2022-2023学年第一学期</option>
+            <option>2022-2023学年第二学期</option>
+          </select>
+        </div>
+        <div>
+          <label for="status" class="block text-sm font-medium text-gray-700 mb-1">课程状态</label>
+          <select id="status" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+            <option>全部状态</option>
+            <option>进行中</option>
+            <option>已结束</option>
+            <option>未开始</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 课程列表 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- 课程卡片1 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+        <div class="relative h-40">
+          <img class="w-full h-full object-cover" src="https://picsum.photos/id/1/400/200" alt="高等数学课程封面">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              必修课
+            </span>
+          </div>
+          <div class="absolute top-3 right-3">
+            <button class="text-white hover:text-gray-200">
+              <i class="fa fa-ellipsis-v text-lg"></i>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">高等数学</h3>
+          <p class="text-sm text-gray-500 mb-4">微积分、极限、导数、积分及其应用</p>
+          <div class="flex items-center text-sm text-gray-500 mb-4">
+            <i class="fa fa-users mr-1"></i>
+            <span>68名学生</span>
+            <span class="mx-2">·</span>
+            <i class="fa fa-clock-o mr-1"></i>
+            <span>48课时</span>
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-gray-700">课程进度</span>
+              <span class="text-sm font-medium text-primary">65%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-primary h-2 rounded-full" style="width: 65%"></div>
+            </div>
+          </div>
+          <div class="flex space-x-3">
+            <a href="#" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90">
+              <i class="fa fa-cog mr-2"></i>
+              管理课程
+            </a>
+            <button class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              <i class="fa fa-bar-chart mr-2"></i>
+              数据分析
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 课程卡片2 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+        <div class="relative h-40">
+          <img class="w-full h-full object-cover" src="https://picsum.photos/id/20/400/200" alt="线性代数课程封面">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              必修课
+            </span>
+          </div>
+          <div class="absolute top-3 right-3">
+            <button class="text-white hover:text-gray-200">
+              <i class="fa fa-ellipsis-v text-lg"></i>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">线性代数</h3>
+          <p class="text-sm text-gray-500 mb-4">矩阵、行列式、向量空间、线性变换</p>
+          <div class="flex items-center text-sm text-gray-500 mb-4">
+            <i class="fa fa-users mr-1"></i>
+            <span>52名学生</span>
+            <span class="mx-2">·</span>
+            <i class="fa fa-clock-o mr-1"></i>
+            <span>40课时</span>
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-gray-700">课程进度</span>
+              <span class="text-sm font-medium text-primary">48%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-primary h-2 rounded-full" style="width: 48%"></div>
+            </div>
+          </div>
+          <div class="flex space-x-3">
+            <a href="#" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90">
+              <i class="fa fa-cog mr-2"></i>
+              管理课程
+            </a>
+            <button class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              <i class="fa fa-bar-chart mr-2"></i>
+              数据分析
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 课程卡片3 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+        <div class="relative h-40">
+          <img class="w-full h-full object-cover" src="https://picsum.photos/id/42/400/200" alt="概率论与数理统计课程封面">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              选修课
+            </span>
+          </div>
+          <div class="absolute top-3 right-3">
+            <button class="text-white hover:text-gray-200">
+              <i class="fa fa-ellipsis-v text-lg"></i>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">概率论与数理统计</h3>
+          <p class="text-sm text-gray-500 mb-4">概率论基础、随机变量、统计推断、假设检验</p>
+          <div class="flex items-center text-sm text-gray-500 mb-4">
+            <i class="fa fa-users mr-1"></i>
+            <span>45名学生</span>
+            <span class="mx-2">·</span>
+            <i class="fa fa-clock-o mr-1"></i>
+            <span>36课时</span>
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-gray-700">课程进度</span>
+              <span class="text-sm font-medium text-primary">32%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-primary h-2 rounded-full" style="width: 32%"></div>
+            </div>
+          </div>
+          <div class="flex space-x-3">
+            <a href="#" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90">
+              <i class="fa fa-cog mr-2"></i>
+              管理课程
+            </a>
+            <button class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              <i class="fa fa-bar-chart mr-2"></i>
+              数据分析
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 课程卡片4 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+        <div class="relative h-40">
+          <img class="w-full h-full object-cover" src="https://picsum.photos/id/60/400/200" alt="离散数学课程封面">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              选修课
+            </span>
+          </div>
+          <div class="absolute top-3 right-3">
+            <button class="text-white hover:text-gray-200">
+              <i class="fa fa-ellipsis-v text-lg"></i>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">离散数学</h3>
+          <p class="text-sm text-gray-500 mb-4">集合论、图论、代数结构、数理逻辑</p>
+          <div class="flex items-center text-sm text-gray-500 mb-4">
+            <i class="fa fa-users mr-1"></i>
+            <span>38名学生</span>
+            <span class="mx-2">·</span>
+            <i class="fa fa-clock-o mr-1"></i>
+            <span>32课时</span>
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-gray-700">课程进度</span>
+              <span class="text-sm font-medium text-primary">25%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-primary h-2 rounded-full" style="width: 25%"></div>
+            </div>
+          </div>
+          <div class="flex space-x-3">
+            <a href="#" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90">
+              <i class="fa fa-cog mr-2"></i>
+              管理课程
+            </a>
+            <button class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              <i class="fa fa-bar-chart mr-2"></i>
+              数据分析
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 课程卡片5 -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+        <div class="relative h-40">
+          <img class="w-full h-full object-cover" src="https://picsum.photos/id/96/400/200" alt="常微分方程课程封面">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="absolute bottom-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+              实践课
+            </span>
+          </div>
+          <div class="absolute top-3 right-3">
+            <button class="text-white hover:text-gray-200">
+              <i class="fa fa-ellipsis-v text-lg"></i>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-2">常微分方程</h3>
+          <p class="text-sm text-gray-500 mb-4">一阶微分方程、高阶微分方程、微分方程应用</p>
+          <div class="flex items-center text-sm text-gray-500 mb-4">
+            <i class="fa fa-users mr-1"></i>
+            <span>28名学生</span>
+            <span class="mx-2">·</span>
+            <i class="fa fa-clock-o mr-1"></i>
+            <span>24课时</span>
+          </div>
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-gray-700">课程进度</span>
+              <span class="text-sm font-medium text-primary">15%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-primary h-2 rounded-full" style="width: 15%"></div>
+            </div>
+          </div>
+          <div class="flex space-x-3">
+            <a href="#" class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90">
+              <i class="fa fa-cog mr-2"></i>
+              管理课程
+            </a>
+            <button class="flex-1 inline-flex justify-center items-center px-3 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              <i class="fa fa-bar-chart mr-2"></i>
+              数据分析
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 创建新课程卡片 -->
+      <div class="flex items-center justify-center bg-white border-2 border-dashed border-gray-300 rounded-lg shadow-sm p-6 h-full min-h-[350px] hover:border-primary transition-colors">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fa fa-plus text-2xl text-primary"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-1">创建新课程</h3>
+          <p class="text-sm text-gray-500 mb-4">添加新课程内容和学习资源</p>
+          <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fa fa-plus mr-2"></i>
+            新建课程
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 分页控件 -->
+    <div class="mt-8 flex justify-center">
+      <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+          <i class="fa fa-chevron-left"></i>
+        </a>
+        <a href="#" aria-current="page" class="z-10 bg-primary text-white relative inline-flex items-center px-4 py-2 border border-primary text-sm font-medium">
+          1
+        </a>
+        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+          2
+        </a>
+        <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+          ...
+        </span>
+        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+          10
+        </a>
+        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+          <i class="fa fa-chevron-right"></i>
+        </a>
+      </nav>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-500">
+        © 2025 个性化学习路径的在线课程管理系统 | 版权所有
+      </p>
+    </div>
+  </footer>
+
+  <!-- 模态框：创建新课程 -->
+  <div id="create-course-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h4 class="modal-title">创建新课程</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- 表单将通过JavaScript动态加载 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-close px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          取消
+        </button>
+        <button class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          创建课程
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入JavaScript -->
+  <script src="../assets/js/script.js"></script>
+</body>
+</html>

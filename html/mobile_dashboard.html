@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>学生首页 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .card-shadow {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      }
+      .card-hover {
+        transition: transform 0.2s ease;
+      }
+      .card-hover:active {
+        transform: scale(0.98);
+      }
+      .nav-item-active {
+        color: #4361ee;
+        font-weight: 500;
+      }
+      .nav-item-icon-active {
+        background-color: #4361ee;
+        color: white;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <!-- 状态栏 - 模拟华为Mate 70Pro状态栏 -->
+  <div class="bg-white px-4 py-2 flex items-center justify-between border-b border-gray-200">
+    <div class="text-sm font-medium text-gray-900">10:30</div>
+    <div class="flex items-center space-x-1">
+      <i class="fa fa-signal text-gray-700"></i>
+      <i class="fa fa-wifi text-gray-700"></i>
+      <i class="fa fa-battery-three-quarters text-gray-700"></i>
+    </div>
+  </div>
+
+  <!-- 顶部导航 -->
+  <header class="bg-white px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center">
+      <img src="https://picsum.photos/id/1012/60/60" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
+      <div class="ml-3">
+        <h1 class="text-lg font-semibold text-gray-900">您好，王小明</h1>
+        <p class="text-xs text-gray-500">今天是个学习的好日子</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-3">
+      <button class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-700">
+        <i class="fa fa-bell"></i>
+        <span class="absolute top-14 right-10 w-2 h-2 bg-red-500 rounded-full"></span>
+      </button>
+      <button class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-700">
+        <i class="fa fa-cog"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="flex-1 px-4 py-4 overflow-y-auto">
+    <!-- 统计卡片 -->
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <!-- 课程总数 -->
+      <div class="bg-white rounded-xl p-4 card-shadow card-hover">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500">课程总数</p>
+            <h2 class="text-xl font-bold text-gray-900 mt-1">6</h2>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <i class="fa fa-book"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 进行中课程 -->
+      <div class="bg-white rounded-xl p-4 card-shadow card-hover">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500">进行中课程</p>
+            <h2 class="text-xl font-bold text-gray-900 mt-1">4</h2>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center text-success">
+            <i class="fa fa-spinner"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 待完成作业 -->
+      <div class="bg-white rounded-xl p-4 card-shadow card-hover">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500">待完成作业</p>
+            <h2 class="text-xl font-bold text-gray-900 mt-1">3</h2>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center text-warning">
+            <i class="fa fa-file-text-o"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 平均成绩 -->
+      <div class="bg-white rounded-xl p-4 card-shadow card-hover">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500">平均成绩</p>
+            <h2 class="text-xl font-bold text-gray-900 mt-1">88.5</h2>
+          </div>
+          <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+            <i class="fa fa-graduation-cap"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 学习进度概览 -->
+    <div class="bg-white rounded-xl p-4 mb-6 card-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-gray-900">学习进度概览</h2>
+        <button class="text-xs text-primary">查看全部</button>
+      </div>
+      <div class="space-y-4">
+        <!-- 高等数学 -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 mr-2">
+                <i class="fa fa-calculator"></i>
+              </div>
+              <span class="text-sm text-gray-700">高等数学</span>
+            </div>
+            <span class="text-xs font-medium text-blue-600">65%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-1.5">
+            <div class="bg-blue-600 h-1.5 rounded-full" style="width: 65%"></div>
+          </div>
+        </div>
+        
+        <!-- 线性代数 -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600 mr-2">
+                <i class="fa fa-table"></i>
+              </div>
+              <span class="text-sm text-gray-700">线性代数</span>
+            </div>
+            <span class="text-xs font-medium text-green-600">45%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-1.5">
+            <div class="bg-green-600 h-1.5 rounded-full" style="width: 45%"></div>
+          </div>
+        </div>
+        
+        <!-- 概率论 -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600 mr-2">
+                <i class="fa fa-random"></i>
+              </div>
+              <span class="text-sm text-gray-700">概率论</span>
+            </div>
+            <span class="text-xs font-medium text-purple-600">30%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-1.5">
+            <div class="bg-purple-600 h-1.5 rounded-full" style="width: 30%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 学习路径推荐 -->
+    <div class="bg-white rounded-xl p-4 mb-6 card-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-gray-900">学习路径推荐</h2>
+        <button class="text-xs text-primary">查看详情</button>
+      </div>
+      <div class="p-3 bg-blue-50 rounded-lg mb-3">
+        <div class="flex items-start">
+          <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-3 mt-0.5">
+            <i class="fa fa-lightbulb-o"></i>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-800 mb-1">优先学习函数极限</p>
+            <p class="text-xs text-gray-600">根据您的测验结果，系统建议您先巩固函数极限知识点，这对后续学习至关重要。</p>
+          </div>
+        </div>
+      </div>
+      <button class="w-full py-2 bg-primary text-white rounded-lg text-sm font-medium">
+        开始学习
+      </button>
+    </div>
+    
+    <!-- 学习风险预测 -->
+    <div class="bg-white rounded-xl p-4 mb-6 card-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-gray-900">学习风险预测</h2>
+        <button class="text-xs text-primary">详细分析</button>
+      </div>
+      <div class="flex items-center justify-center mb-4">
+        <div class="relative w-32 h-32">
+          <canvas id="riskChart"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-xl font-bold text-yellow-600">35%</span>
+            <span class="text-xs text-gray-500">挂科风险</span>
+          </div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-600 text-center mb-3">您的概率论课程存在一定风险，建议增加学习时间。</p>
+      <button class="w-full py-2 bg-yellow-50 text-yellow-600 border border-yellow-200 rounded-lg text-sm font-medium">
+        获取学习建议
+      </button>
+    </div>
+    
+    <!-- 最近活动 -->
+    <div class="bg-white rounded-xl p-4 mb-6 card-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-gray-900">最近活动</h2>
+        <button class="text-xs text-primary">更多</button>
+      </div>
+      <div class="space-y-4">
+        <div class="flex">
+          <div class="relative">
+            <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 z-10 relative">
+              <i class="fa fa-check text-xs"></i>
+            </div>
+            <div class="absolute top-6 left-3 w-px h-full bg-gray-200"></div>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-gray-700">完成高等数学作业</p>
+            <p class="text-xs text-gray-500">今天 09:45</p>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="relative">
+            <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-600 z-10 relative">
+              <i class="fa fa-play text-xs"></i>
+            </div>
+            <div class="absolute top-6 left-3 w-px h-full bg-gray-200"></div>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-gray-700">观看线性代数视频</p>
+            <p class="text-xs text-gray-500">昨天 16:30</p>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+            <i class="fa fa-comment-o text-xs"></i>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-gray-700">向智能助手提问</p>
+            <p class="text-xs text-gray-500">昨天 14:20</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 学习时间统计 -->
+    <div class="bg-white rounded-xl p-4 card-shadow">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-gray-900">本周学习时间</h2>
+        <button class="text-xs text-primary">周视图</button>
+      </div>
+      <div class="h-48">
+        <canvas id="studyTimeChart"></canvas>
+      </div>
+      <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+        <span>总计: 8.5小时</span>
+        <span>较上周: +12%</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- 底部导航栏 - 模拟HarmonyOS底部TabBar -->
+  <nav class="bg-white border-t border-gray-200 py-2 px-4">
+    <div class="grid grid-cols-5 gap-2">
+      <!-- 首页 -->
+      <div class="flex flex-col items-center">
+        <div class="w-10 h-10 rounded-full nav-item-icon-active flex items-center justify-center mb-0.5">
+          <i class="fa fa-home"></i>
+        </div>
+        <span class="text-xs nav-item-active">首页</span>
+      </div>
+      
+      <!-- 课程 -->
+      <div class="flex flex-col items-center">
+        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-0.5 text-gray-500">
+          <i class="fa fa-book"></i>
+        </div>
+        <span class="text-xs text-gray-500">课程</span>
+      </div>
+      
+      <!-- 作业 -->
+      <div class="flex flex-col items-center">
+        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-0.5 text-gray-500">
+          <i class="fa fa-file-text-o"></i>
+        </div>
+        <span class="text-xs text-gray-500">作业</span>
+      </div>
+      
+      <!-- 成绩 -->
+      <div class="flex flex-col items-center">
+        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-0.5 text-gray-500">
+          <i class="fa fa-graduation-cap"></i>
+        </div>
+        <span class="text-xs text-gray-500">成绩</span>
+      </div>
+      
+      <!-- 我的 -->
+      <div class="flex flex-col items-center">
+        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-0.5 text-gray-500">
+          <i class="fa fa-user"></i>
+        </div>
+        <span class="text-xs text-gray-500">我的</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 引入JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 更新状态栏时间
+      function updateStatusBarTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const statusBarTime = document.querySelector('.bg-white.px-4.py-2.flex.items-center.justify-between.border-b.border-gray-200 .text-sm.font-medium.text-gray-900');
+        if (statusBarTime) {
+          statusBarTime.textContent = `${hours}:${minutes}`;
+        }
+      }
+      
+      // 初始化状态栏时间
+      updateStatusBarTime();
+      
+      // 每分钟更新一次状态栏时间
+      setInterval(updateStatusBarTime, 60000);
+      
+      // 学习风险图表
+      const riskCtx = document.getElementById('riskChart').getContext('2d');
+      const riskChart = new Chart(riskCtx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [35, 65],
+            backgroundColor: ['#f72585', '#e0e7ff'],
+            borderWidth: 0,
+            cutout: '75%'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              enabled: false
+            }
+          }
+        }
+      });
+      
+      // 学习时间统计图表
+      const studyTimeCtx = document.getElementById('studyTimeChart').getContext('2d');
+      const studyTimeChart = new Chart(studyTimeCtx, {
+        type: 'bar',
+        data: {
+          labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+          datasets: [{
+            label: '学习时间(小时)',
+            data: [1.2, 0.8, 1.5, 1.0, 1.2, 1.5, 1.3],
+            backgroundColor: '#4361ee',
+            borderRadius: 4,
+            barThickness: 24
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.raw + '小时';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                display: true,
+                color: 'rgba(0, 0, 0, 0.05)'
+              },
+              ticks: {
+                font: {
+                  size: 10
+                },
+                stepSize: 1
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: {
+                  size: 10
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      // 底部导航栏点击事件
+      const navItems = document.querySelectorAll('nav .grid-cols-5 > div');
+      navItems.forEach((item, index) => {
+        item.addEventListener('click', function() {
+          // 移除所有导航项的选中状态
+          navItems.forEach(navItem => {
+            const iconDiv = navItem.querySelector('div');
+            const textSpan = navItem.querySelector('span');
+            iconDiv.classList.remove('nav-item-icon-active');
+            iconDiv.classList.add('bg-gray-100', 'text-gray-500');
+            textSpan.classList.remove('nav-item-active');
+            textSpan.classList.add('text-gray-500');
+          });
+          
+          // 添加当前导航项的选中状态
+          const iconDiv = this.querySelector('div');
+          const textSpan = this.querySelector('span');
+          iconDiv.classList.remove('bg-gray-100', 'text-gray-500');
+          iconDiv.classList.add('nav-item-icon-active');
+          textSpan.classList.remove('text-gray-500');
+          textSpan.classList.add('nav-item-active');
+          
+          // 根据不同的导航项跳转到不同的页面
+          if (index === 1) {
+            // 课程
+            window.location.href = 'mobile_courses.html';
+          } else if (index === 2) {
+            // 作业
+            // 这里可以添加作业页面的跳转逻辑
+          } else if (index === 3) {
+            // 成绩
+            // 这里可以添加成绩页面的跳转逻辑
+          } else if (index === 4) {
+            // 我的
+            // 这里可以添加个人中心页面的跳转逻辑
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

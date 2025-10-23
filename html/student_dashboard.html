@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学生首页 - 个性化学习路径的在线课程管理系统</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  
+  <!-- 引入后端服务 -->
+  <script src="../assets/js/backend.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361ee',
+            secondary: '#3a0ca3',
+            success: '#4cc9f0',
+            warning: '#f72585',
+            danger: '#ff0054',
+            'text-primary': '#2b2d42',
+            'text-secondary': '#8d99ae',
+            'bg-light': '#edf2f4',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .dashboard-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+      }
+      .progress-circle {
+        position: relative;
+        width: 100px;
+        height: 100px;
+      }
+      .progress-circle svg {
+        transform: rotate(-90deg);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- 顶部导航栏 -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <!-- 左侧Logo和名称 -->
+        <div class="flex items-center">
+          <a href="#" class="flex-shrink-0 flex items-center">
+            <i class="fa fa-graduation-cap text-primary text-2xl mr-2"></i>
+            <span class="font-bold text-lg text-primary">学习路径系统</span>
+          </a>
+          
+          <!-- 导航链接 - 中等屏幕以上显示 -->
+          <div class="hidden md:ml-10 md:flex md:space-x-8">
+            <a href="student_dashboard.html" class="border-primary text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-home mr-2"></i>
+              首页
+            </a>
+            <a href="courses.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-book mr-2"></i>
+              我的课程
+            </a>
+            <a href="assignments.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-file-text mr-2"></i>
+              作业中心
+            </a>
+            <a href="grades.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              <i class="fa fa-graduation-cap mr-2"></i>
+              成绩查询
+            </a>
+          </div>
+        </div>
+        
+        <!-- 右侧用户信息和操作 -->
+        <div class="flex items-center">
+          <!-- 搜索框 -->
+          <div class="hidden md:block">
+            <div class="ml-3 relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fa fa-search text-gray-400"></i>
+              </div>
+              <input class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary" placeholder="搜索课程、作业...">
+            </div>
+          </div>
+          
+          <!-- 通知图标 -->
+          <div class="ml-3 relative">
+            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-bell text-xl"></i>
+              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
+            </button>
+          </div>
+          
+          <!-- 智能助手 -->
+          <div class="ml-3 relative">
+            <button class="chat-bot-button text-gray-500 hover:text-gray-700 focus:outline-none">
+              <i class="fa fa-robot text-xl text-primary"></i>
+            </button>
+          </div>
+          
+          <!-- 用户头像 -->
+          <div class="ml-3 relative">
+            <div class="flex items-center">
+              <img class="h-8 w-8 rounded-full object-cover" src="https://picsum.photos/id/64/200/200" alt="用户头像">
+              <span class="ml-2 text-sm font-medium text-gray-700">张同学</span>
+              <i class="fa fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- 欢迎信息 -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">你好，张同学！👋</h1>
+      <p class="text-gray-600 mt-1">今天是星期三，继续加油学习吧！</p>
+    </div>
+    
+    <!-- 统计卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- 课程总数 -->
+      <div class="dashboard-card bg-white overflow-hidden shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+              <i class="fa fa-book text-white text-xl"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">课程总数</dt>
+                <dd>
+                  <div class="text-lg font-semibold text-gray-900">8</div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 进行中课程 -->
+      <div class="dashboard-card bg-white overflow-hidden shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+              <i class="fa fa-spinner text-white text-xl"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">进行中课程</dt>
+                <dd>
+                  <div class="text-lg font-semibold text-gray-900">5</div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 待完成作业 -->
+      <div class="dashboard-card bg-white overflow-hidden shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+              <i class="fa fa-file-text text-white text-xl"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">待完成作业</dt>
+                <dd>
+                  <div class="text-lg font-semibold text-gray-900">3</div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 平均成绩 -->
+      <div class="dashboard-card bg-white overflow-hidden shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+              <i class="fa fa-trophy text-white text-xl"></i>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 truncate">平均成绩</dt>
+                <dd>
+                  <div class="text-lg font-semibold text-gray-900">87.5</div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 主要内容网格 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 左侧：学习进度和推荐 -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- 学习进度概览 -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 flex items-center">
+              <i class="fa fa-line-chart text-primary mr-2"></i>
+              学习进度概览
+            </h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <div class="space-y-6">
+              <!-- 高等数学 -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-medium text-gray-700">高等数学</span>
+                  <span class="text-sm text-gray-500">68%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-blue-600 h-2.5 rounded-full" style="width: 68%"></div>
+                </div>
+              </div>
+              
+              <!-- 线性代数 -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-medium text-gray-700">线性代数</span>
+                  <span class="text-sm text-gray-500">42%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-green-600 h-2.5 rounded-full" style="width: 42%"></div>
+                </div>
+              </div>
+              
+              <!-- 概率论与数理统计 -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-medium text-gray-700">概率论与数理统计</span>
+                  <span class="text-sm text-gray-500">85%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-purple-600 h-2.5 rounded-full" style="width: 85%"></div>
+                </div>
+              </div>
+              
+              <!-- 计算机基础 -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-medium text-gray-700">计算机基础</span>
+                  <span class="text-sm text-gray-500">75%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-orange-600 h-2.5 rounded-full" style="width: 75%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 个性化学习路径推荐 -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 flex items-center">
+              <i class="fa fa-lightbulb-o text-yellow-500 mr-2"></i>
+              个性化学习路径推荐
+            </h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <div class="mb-4">
+              <p class="text-gray-600 mb-4">基于你的学习数据和测验表现，我们为你推荐了以下学习路径：</p>
+              
+              <div class="border border-gray-200 rounded-lg p-4 bg-blue-50 mb-4">
+                <div class="flex items-center mb-2">
+                  <span class="bg-blue-500 text-white text-xs font-bold px-2.5 py-0.5 rounded-full mr-2">重点推荐</span>
+                  <h4 class="font-medium text-gray-900">代数基础巩固</h4>
+                </div>
+                <p class="text-sm text-gray-700 mb-3">根据你的测验结果，我们发现你在代数部分存在知识薄弱点，建议优先巩固这部分内容。</p>
+                <button class="recommendation-button data-course-id="math-101" inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <i class="fa fa-road mr-2"></i>
+                  查看详细学习路径
+                </button>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border border-gray-200 rounded-lg p-4">
+                  <h4 class="font-medium text-gray-900 mb-2">微分方程专题</h4>
+                  <p class="text-sm text-gray-700 mb-3">进一步学习微分方程的解法和应用，提升你的数学应用能力。</p>
+                  <button class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fa fa-book mr-2"></i>
+                    开始学习
+                  </button>
+                </div>
+                
+                <div class="border border-gray-200 rounded-lg p-4">
+                  <h4 class="font-medium text-gray-900 mb-2">概率论习题集</h4>
+                  <p class="text-sm text-gray-700 mb-3">通过习题巩固概率论知识，提高解题能力和应试技巧。</p>
+                  <button class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fa fa-pencil mr-2"></i>
+                    开始练习
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 右侧：最近活动和学习统计 -->
+      <div class="space-y-6">
+        <!-- 学习风险预测 -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 flex items-center">
+              <i class="fa fa-bar-chart text-primary mr-2"></i>
+              学习风险预测
+            </h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center justify-center mb-4">
+              <div class="relative">
+                <svg class="w-40 h-40" viewBox="0 0 100 100">
+                  <!-- 背景圆环 -->
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" stroke-width="10"></circle>
+                  <!-- 进度圆环 -->
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="#fbbf24" stroke-width="10" stroke-dasharray="283" stroke-dashoffset="184"></circle>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <div class="text-center">
+                    <div class="text-3xl font-bold text-gray-900">35%</div>
+                    <div class="text-sm text-gray-500">挂科风险</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="text-gray-600 text-center mb-4">中等风险：建议增加学习时间，及时完成作业</p>
+            <button class="risk-prediction-button data-student-id="1001" w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+              <i class="fa fa-exclamation-triangle mr-2"></i>
+              查看详细分析
+            </button>
+          </div>
+        </div>
+        
+        <!-- 最近活动 -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 flex items-center">
+              <i class="fa fa-list-ul text-primary mr-2"></i>
+              最近活动
+            </h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <div class="space-y-4">
+              <div class="flex">
+                <div class="flex-shrink-0 flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <i class="fa fa-check text-green-600"></i>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm text-gray-900">完成了高等数学作业 #3</p>
+                  <p class="text-xs text-gray-500">今天 10:23</p>
+                </div>
+              </div>
+              
+              <div class="flex">
+                <div class="flex-shrink-0 flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <i class="fa fa-play text-blue-600"></i>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm text-gray-900">观看了线性代数视频：矩阵的秩</p>
+                  <p class="text-xs text-gray-500">昨天 16:45</p>
+                </div>
+              </div>
+              
+              <div class="flex">
+                <div class="flex-shrink-0 flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                    <i class="fa fa-graduation-cap text-purple-600"></i>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm text-gray-900">参加了概率论测验，得分 92/100</p>
+                  <p class="text-xs text-gray-500">前天 14:10</p>
+                </div>
+              </div>
+              
+              <div class="flex">
+                <div class="flex-shrink-0 flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <i class="fa fa-bell text-yellow-600"></i>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm text-gray-900">收到新的作业通知：高等数学作业 #4</p>
+                  <p class="text-xs text-gray-500">3天前</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 学习时间统计 -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 flex items-center">
+              <i class="fa fa-clock-o text-primary mr-2"></i>
+              学习时间统计
+            </h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <div class="mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-gray-700">本周学习时长</span>
+                <span class="text-sm font-semibold text-gray-900">12.5小时</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="bg-green-600 h-2.5 rounded-full" style="width: 70%"></div>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">目标：18小时</p>
+            </div>
+            
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">高等数学</span>
+                <span class="text-sm text-gray-600">4.5小时</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">线性代数</span>
+                <span class="text-sm text-gray-600">3.2小时</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">概率论</span>
+                <span class="text-sm text-gray-600">2.8小时</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">计算机基础</span>
+                <span class="text-sm text-gray-600">2.0小时</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t border-gray-200 mt-8">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm text-gray-500">
+        © 2025 个性化学习路径的在线课程管理系统 | 版权所有
+      </p>
+    </div>
+  </footer>
+
+  <!-- 模态框：学习路径推荐 -->
+  <div id="recommendation-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">个性化学习路径推荐</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- 内容将通过JavaScript动态加载 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-close px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          关闭
+        </button>
+        <button class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          采纳推荐
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：学习风险预测 -->
+  <div id="risk-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">学习风险预测分析</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- 内容将通过JavaScript动态加载 -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-close px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          关闭
+        </button>
+        <button class="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          获取辅导
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模态框：智能答疑机器人 -->
+  <div id="chat-bot-modal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <div class="modal-header">
+        <h4 class="modal-title">智能学习助手</h4>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <div class="chat-container h-[400px] overflow-y-auto p-4 space-y-3">
+          <!-- 聊天内容将通过JavaScript动态加载 -->
+        </div>
+        <div class="border-t p-3 flex">
+          <input type="text" class="chat-input flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="请问有什么可以帮助你的？">
+          <button class="chat-send px-4 py-2 bg-primary text-white rounded-r-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fa fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 引入JavaScript -->
+  <script src="../assets/js/backend.js"></script>
+  <script src="../assets/js/script.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查用户是否已登录
+      if (!backend.isLoggedIn()) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const user = backend.getCurrentUser();
+      
+      // 欢迎信息更新
+      const welcomeMessage = document.querySelector('h1.text-2xl');
+      if (welcomeMessage && user && user.name) {
+        welcomeMessage.textContent = `你好，${user.name}！👋`;
+      }
+      
+      // 更新用户头像和名称
+      const userAvatar = document.querySelector('img.h-8.w-8.rounded-full');
+      const userName = document.querySelector('span.ml-2.text-sm.font-medium');
+      if (userAvatar && userName && user && user.name) {
+        userName.textContent = user.name;
+      }
+      
+      // 加载学生数据
+      if (user && user.id) {
+        loadStudentData(user.id);
+        
+        // 加载学习进度
+        loadLearningProgress(user.id);
+      }
+      
+      // 学习路径推荐按钮事件
+      const recommendationButton = document.querySelector('.recommendation-button');
+      if (recommendationButton) {
+        recommendationButton.addEventListener('click', function() {
+          // 假设点击高等数学课程的推荐
+          showLearningPathRecommendation(user.id, 1);
+        });
+      }
+      
+      // 学习风险预测按钮事件
+      const riskPredictionButton = document.querySelector('.risk-prediction-button');
+      if (riskPredictionButton) {
+        riskPredictionButton.addEventListener('click', function() {
+          showRiskPrediction(user.id);
+        });
+      }
+      
+      // 智能助手按钮事件
+      const chatBotButton = document.querySelector('.chat-bot-button');
+      if (chatBotButton) {
+        chatBotButton.addEventListener('click', function() {
+          openChatBot();
+        });
+      }
+      
+      // 登出功能
+      const userProfile = document.querySelector('.flex.items-center .ml-3.relative');
+      if (userProfile) {
+        userProfile.addEventListener('click', function() {
+          if (confirm('确定要退出登录吗？')) {
+            backend.logout();
+            window.location.href = 'login.html';
+          }
+        });
+      }
+    });
+    
+    // 加载学生数据
+    async function loadStudentData(studentId) {
+      try {
+        // 显示加载状态
+        showLoadingState(true);
+        
+        // 并行加载多种数据
+        const [coursesResult, assignmentsResult, gradesResult] = await Promise.all([
+          backend.getCourses(studentId, 'student'),
+          backend.getAssignments(null, studentId, 'student'),
+          backend.getGrades(studentId)
+        ]);
+        
+        if (coursesResult.success && assignmentsResult.success && gradesResult.success) {
+          const courses = coursesResult.data;
+          const assignments = assignmentsResult.data;
+          const grades = gradesResult.data;
+          
+          // 更新统计卡片
+          updateStatisticsCards(courses, assignments, grades);
+          
+          // 更新学习时间统计
+          updateStudyTimeStatistics(courses);
+          
+          // 更新最近活动
+          updateRecentActivities();
+        } else {
+          console.error('Failed to load student data');
+        }
+      } catch (error) {
+        console.error('Error loading student data:', error);
+      } finally {
+        // 隐藏加载状态
+        showLoadingState(false);
+      }
+    }
+    
+    // 加载学习进度
+    async function loadLearningProgress(studentId) {
+      try {
+        const progressResult = await backend.getProgress(studentId);
+        
+        if (progressResult.success) {
+          const progressData = progressResult.data;
+          
+          // 更新学习进度概览
+          updateLearningProgressOverview(progressData);
+        } else {
+          console.error('Failed to load learning progress');
+        }
+      } catch (error) {
+        console.error('Error loading learning progress:', error);
+      }
+    }
+    
+    // 更新统计卡片
+    function updateStatisticsCards(courses, assignments, grades) {
+      // 课程总数
+      const totalCoursesElement = document.querySelector('.dashboard-card:nth-child(1) .text-lg.font-semibold');
+      if (totalCoursesElement) {
+        totalCoursesElement.textContent = courses.length;
+      }
+      
+      // 进行中课程
+      const activeCoursesElement = document.querySelector('.dashboard-card:nth-child(2) .text-lg.font-semibold');
+      if (activeCoursesElement) {
+        const activeCourses = courses.filter(course => course.completedChapters < course.totalChapters);
+        activeCoursesElement.textContent = activeCourses.length;
+      }
+      
+      // 待完成作业
+      const pendingAssignmentsElement = document.querySelector('.dashboard-card:nth-child(3) .text-lg.font-semibold');
+      if (pendingAssignmentsElement) {
+        const pendingAssignments = assignments.filter(assignment => 
+          assignment.status === 'active' && (!assignment.submission || assignment.submission.status !== 'graded')
+        );
+        pendingAssignmentsElement.textContent = pendingAssignments.length;
+      }
+      
+      // 平均成绩
+      const averageGradeElement = document.querySelector('.dashboard-card:nth-child(4) .text-lg.font-semibold');
+      if (averageGradeElement && grades.length > 0) {
+        const totalScore = grades.reduce((sum, grade) => sum + grade.score, 0);
+        const averageScore = (totalScore / grades.length).toFixed(1);
+        averageGradeElement.textContent = averageScore;
+      }
+    }
+    
+    // 更新学习进度概览
+    function updateLearningProgressOverview(progressData) {
+      const progressContainer = document.querySelector('.space-y-6');
+      if (progressContainer && progressData.length > 0) {
+        // 清空现有内容
+        progressContainer.innerHTML = '';
+        
+        // 为每个课程创建进度条
+        progressData.forEach(progress => {
+          // 找到对应的课程
+          const course = backend.mockData.courses.find(c => c.id === progress.courseId);
+          if (course) {
+            const progressBar = document.createElement('div');
+            progressBar.className = 'mb-4';
+            progressBar.innerHTML = `
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-gray-700">${course.name}</span>
+                <span class="text-sm text-gray-500">${progress.overallProgress}%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="h-2.5 rounded-full" style="width: ${progress.overallProgress}%; background-color: ${getProgressColor(progress.overallProgress)}"></div>
+              </div>
+            `;
+            
+            progressContainer.appendChild(progressBar);
+          }
+        });
+      }
+    }
+    
+    // 获取进度条颜色
+    function getProgressColor(progress) {
+      if (progress < 30) return '#ef4444'; // 红色
+      if (progress < 70) return '#f59e0b'; // 黄色
+      return '#10b981'; // 绿色
+    }
+    
+    // 更新学习时间统计
+    function updateStudyTimeStatistics(courses) {
+      // 模拟学习时间数据
+      const studyTimeData = {
+        total: 12.5,
+        target: 18,
+        courses: [
+          { name: '高等数学', hours: 4.5 },
+          { name: '线性代数', hours: 3.2 },
+          { name: '概率论', hours: 2.8 },
+          { name: '计算机基础', hours: 2.0 }
+        ]
+      };
+      
+      // 更新总学习时长
+      const totalHoursElement = document.querySelector('.text-sm.font-semibold.text-gray-900');
+      const progressBarFill = document.querySelector('.bg-green-600.h-2.5.rounded-full');
+      const targetText = document.querySelector('.text-xs.text-gray-500');
+      
+      if (totalHoursElement && progressBarFill && targetText) {
+        totalHoursElement.textContent = `${studyTimeData.total}小时`;
+        const progressPercentage = Math.min(100, (studyTimeData.total / studyTimeData.target) * 100);
+        progressBarFill.style.width = `${progressPercentage}%`;
+        targetText.textContent = `目标：${studyTimeData.target}小时`;
+      }
+      
+      // 更新各课程学习时间
+      const coursesTimeList = document.querySelector('.space-y-3');
+      if (coursesTimeList) {
+        coursesTimeList.innerHTML = '';
+        
+        studyTimeData.courses.forEach(course => {
+          const timeItem = document.createElement('div');
+          timeItem.className = 'flex justify-between items-center';
+          timeItem.innerHTML = `
+            <span class="text-sm text-gray-600">${course.name}</span>
+            <span class="text-sm text-gray-600">${course.hours}小时</span>
+          `;
+          
+          coursesTimeList.appendChild(timeItem);
+        });
+      }
+    }
+    
+    // 更新最近活动
+    function updateRecentActivities() {
+      // 模拟最近活动数据
+      const recentActivities = [
+        { type: 'completed', message: '完成了高等数学作业 #3', time: '今天 10:23', icon: 'check', color: 'green' },
+        { type: 'watched', message: '观看了线性代数视频：矩阵的秩', time: '昨天 16:45', icon: 'play', color: 'blue' },
+        { type: 'graded', message: '参加了概率论测验，得分 92/100', time: '前天 14:10', icon: 'graduation-cap', color: 'purple' },
+        { type: 'notified', message: '收到新的作业通知：高等数学作业 #4', time: '3天前', icon: 'bell', color: 'yellow' }
+      ];
+      
+      const activitiesContainer = document.querySelector('.space-y-4');
+      if (activitiesContainer) {
+        activitiesContainer.innerHTML = '';
+        
+        recentActivities.forEach(activity => {
+          const activityItem = document.createElement('div');
+          activityItem.className = 'flex';
+          activityItem.innerHTML = `
+            <div class="flex-shrink-0 flex items-center">
+              <div class="h-8 w-8 rounded-full bg-${activity.color}-100 flex items-center justify-center">
+                <i class="fa fa-${activity.icon} text-${activity.color}-600"></i>
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-900">${activity.message}</p>
+              <p class="text-xs text-gray-500">${activity.time}</p>
+            </div>
+          `;
+          
+          activitiesContainer.appendChild(activityItem);
+        });
+      }
+    }
+    
+    // 显示学习路径推荐
+    async function showLearningPathRecommendation(studentId, courseId) {
+      try {
+        const result = await backend.getLearningPath(courseId, studentId);
+        
+        if (result.success) {
+          const recommendation = result.data;
+          
+          // 获取模态框
+          const modal = document.getElementById('recommendation-modal');
+          const modalBody = modal.querySelector('.modal-body');
+          
+          if (modalBody) {
+            // 填充模态框内容
+            modalBody.innerHTML = `
+              <div class="mb-4">
+                <h5 class="text-lg font-medium text-gray-900 mb-2">${recommendation.courseName} - 个性化学习路径</h5>
+                <p class="text-gray-600">当前学习进度: <span class="font-medium text-primary">${recommendation.overallProgress}%</span></p>
+              </div>
+              
+              ${recommendation.weakChapters.length > 0 ? `
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                  <h6 class="text-sm font-medium text-yellow-800">薄弱章节</h6>
+                  <p class="text-sm text-yellow-700 mt-1">建议重点复习以下章节: ${recommendation.weakChapters.join(', ')}章</p>
+                </div>
+              ` : ''}
+              
+              <div class="mb-4">
+                <h6 class="text-sm font-medium text-gray-900 mb-2">推荐学习顺序</h6>
+                <ol class="space-y-2">
+                  ${recommendation.recommendedOrder.map((item, index) => `
+                    <li class="flex items-start">
+                      <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full mt-0.5">${index + 1}</span>
+                      <div>
+                        <p class="text-sm text-gray-900">第${item.chapter}章</p>
+                        <p class="text-xs text-gray-500">${item.reason}</p>
+                      </div>
+                    </li>
+                  `).join('')}
+                </ol>
+              </div>
+              
+              <div>
+                <h6 class="text-sm font-medium text-gray-900 mb-2">推荐学习资源</h6>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  ${recommendation.resources.map(resource => `
+                    <div class="bg-gray-50 border border-gray-200 rounded-md p-3 flex items-center">
+                      <i class="fa fa-${getResourceIcon(resource.type)} text-primary mr-2"></i>
+                      <div>
+                        <p class="text-sm text-gray-900">${resource.title}</p>
+                        <p class="text-xs text-gray-500">${getResourceDetails(resource)}</p>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+          
+          // 显示模态框
+          modal.style.display = 'flex';
+        }
+      } catch (error) {
+        console.error('Error loading learning path recommendation:', error);
+        alert('加载学习路径推荐失败，请稍后重试');
+      }
+    }
+    
+    // 获取资源图标
+    function getResourceIcon(type) {
+      const icons = {
+        'video': 'play-circle',
+        'document': 'file-text-o',
+        'exercise': 'pencil',
+        'quiz': 'check-square-o'
+      };
+      return icons[type] || 'book';
+    }
+    
+    // 获取资源详情
+    function getResourceDetails(resource) {
+      if (resource.duration) return resource.duration;
+      if (resource.pages) return resource.pages;
+      if (resource.questions) return resource.questions;
+      return '学习资源';
+    }
+    
+    // 显示学习风险预测
+    async function showRiskPrediction(studentId) {
+      try {
+        // 假设检查第一门课程的风险
+        const result = await backend.predictLearningRisk(studentId, 1);
+        
+        if (result.success) {
+          const riskData = result.data;
+          
+          // 获取模态框
+          const modal = document.getElementById('risk-modal');
+          const modalBody = modal.querySelector('.modal-body');
+          
+          if (modalBody) {
+            // 填充模态框内容
+            modalBody.innerHTML = `
+              <div class="flex justify-center mb-6">
+                <div class="relative w-32 h-32">
+                  <svg class="w-full h-full" viewBox="0 0 100 100">
+                    <!-- 背景圆环 -->
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" stroke-width="10"></circle>
+                    <!-- 进度圆环 -->
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="${getRiskColor(riskData.riskLevel)}" stroke-width="10" stroke-dasharray="283" stroke-dashoffset="${283 - (riskData.riskPercentage / 100 * 283)}"></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gray-900">${riskData.riskPercentage}%</div>
+                      <div class="text-xs text-gray-500">挂科风险</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <p class="text-center text-gray-600 mb-2">${getRiskLevelText(riskData.riskLevel)}</p>
+                <div class="grid grid-cols-2 gap-4 text-center">
+                  <div class="bg-gray-50 p-2 rounded-md">
+                    <p class="text-xs text-gray-500">平均成绩</p>
+                    <p class="text-lg font-medium text-gray-900">${riskData.avgScore}</p>
+                  </div>
+                  <div class="bg-gray-50 p-2 rounded-md">
+                    <p class="text-xs text-gray-500">学习进度</p>
+                    <p class="text-lg font-medium text-gray-900">${riskData.progress}%</p>
+                  </div>
+                </div>
+              </div>
+              
+              ${riskData.riskFactors.length > 0 ? `
+                <div class="mb-4">
+                  <h6 class="text-sm font-medium text-gray-900 mb-2">风险因素</h6>
+                  <ul class="list-disc pl-5 space-y-1">
+                    ${riskData.riskFactors.map(factor => `<li class="text-sm text-gray-700">${factor}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+              
+              <div>
+                <h6 class="text-sm font-medium text-gray-900 mb-2">学习建议</h6>
+                <ul class="list-disc pl-5 space-y-1">
+                  ${riskData.recommendations.map(recommendation => `<li class="text-sm text-gray-700">${recommendation}</li>`).join('')}
+                </ul>
+              </div>
+            `;
+          }
+          
+          // 显示模态框
+          modal.style.display = 'flex';
+        }
+      } catch (error) {
+        console.error('Error loading risk prediction:', error);
+        alert('加载学习风险预测失败，请稍后重试');
+      }
+    }
+    
+    // 获取风险等级颜色
+    function getRiskColor(riskLevel) {
+      const colors = {
+        'low': '#10b981', // 绿色
+        'medium': '#f59e0b', // 黄色
+        'high': '#ef4444' // 红色
+      };
+      return colors[riskLevel] || '#9ca3af';
+    }
+    
+    // 获取风险等级文本
+    function getRiskLevelText(riskLevel) {
+      const texts = {
+        'low': '低风险：保持当前学习状态，继续加油！',
+        'medium': '中等风险：建议增加学习时间，及时完成作业',
+        'high': '高风险：需要立即采取行动，寻求教师帮助'
+      };
+      return texts[riskLevel] || '风险评估：暂无数据';
+    }
+    
+    // 打开智能助手
+    function openChatBot() {
+      const modal = document.getElementById('chat-bot-modal');
+      const chatContainer = modal.querySelector('.chat-container');
+      const chatInput = modal.querySelector('.chat-input');
+      const chatSend = modal.querySelector('.chat-send');
+      
+      // 清空聊天记录
+      if (chatContainer) {
+        chatContainer.innerHTML = '';
+        
+        // 添加欢迎消息
+        addBotMessage('你好！我是你的智能学习助手，有什么可以帮助你的吗？');
+      }
+      
+      // 显示模态框
+      modal.style.display = 'flex';
+      
+      // 发送消息事件
+      if (chatSend && chatInput) {
+        chatSend.addEventListener('click', function() {
+          sendChatMessage();
+        });
+        
+        // 回车发送
+        chatInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            sendChatMessage();
+          }
+        });
+      }
+      
+      // 发送消息函数
+      async function sendChatMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        
+        // 清空输入框
+        chatInput.value = '';
+        
+        // 添加用户消息
+        addUserMessage(message);
+        
+        try {
+          // 获取机器人回复
+          const result = await backend.askQuestion(message, backend.getCurrentUser().id);
+          
+          if (result.success) {
+            // 添加机器人回复
+            setTimeout(() => {
+              addBotMessage(result.data.answer);
+            }, 500);
+          }
+        } catch (error) {
+          console.error('Error getting chatbot response:', error);
+          addBotMessage('抱歉，我现在无法回答你的问题，请稍后再试。');
+        }
+      }
+      
+      // 添加用户消息
+      function addUserMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex justify-end';
+        messageElement.innerHTML = `
+          <div class="bg-primary text-white p-2 rounded-l-lg rounded-tr-lg max-w-[80%]">
+            <p class="text-sm">${message}</p>
+          </div>
+        `;
+        chatContainer.appendChild(messageElement);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+      
+      // 添加机器人消息
+      function addBotMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex';
+        messageElement.innerHTML = `
+          <div class="bg-gray-100 p-2 rounded-r-lg rounded-tl-lg max-w-[80%]">
+            <p class="text-sm text-gray-800">${message}</p>
+          </div>
+        `;
+        chatContainer.appendChild(messageElement);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+    
+    // 显示加载状态
+    function showLoadingState(show) {
+      const mainContent = document.querySelector('main');
+      let loadingElement = document.getElementById('loading-overlay');
+      
+      if (show) {
+        if (!loadingElement) {
+          loadingElement = document.createElement('div');
+          loadingElement.id = 'loading-overlay';
+          loadingElement.className = 'fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center';
+          loadingElement.innerHTML = `
+            <div class="text-center">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              <p class="mt-4 text-gray-600">加载中...</p>
+            </div>
+          `;
+          document.body.appendChild(loadingElement);
+        } else {
+          loadingElement.style.display = 'flex';
+        }
+        
+        if (mainContent) {
+          mainContent.style.opacity = '0.5';
+        }
+      } else {
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+        }
+        
+        if (mainContent) {
+          mainContent.style.opacity = '1';
+        }
+      }
+    }
+    
+    // 模态框关闭事件
+    document.querySelectorAll('.modal-close').forEach(button => {
+      button.addEventListener('click', function() {
+        const modal = this.closest('.modal');
+        if (modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+    
+    // 点击模态框外部关闭
+    window.addEventListener('click', function(event) {
+      document.querySelectorAll('.modal').forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
